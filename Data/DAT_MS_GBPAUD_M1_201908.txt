@@ -1,0 +1,21 @@
+HistData.com (c) 2012
+File: DAT_MS_GBPAUD_M1_201908.csv Status Report
+
+Gap of 498s found between 20190801165956 and 20190801170821.
+Gap of 128s found between 20190801171606 and 20190801171820.
+Gap of 512s found between 20190804170623 and 20190804171502.
+Gap of 109s found between 20190804172310 and 20190804172506.
+Gap of 127s found between 20190804172508 and 20190804172721.
+Gap of 108s found between 20190804172723 and 20190804172917.
+Gap of 84s found between 20190805170306 and 20190805170436.
+Gap of 541s found between 20190808170000 and 20190808170907.
+Gap of 119s found between 20190808170943 and 20190808171148.
+Gap of 316s found between 20190811172513 and 20190811173036.
+Gap of 176s found between 20190812170006 and 20190812170309.
+Gap of 257s found between 20190818171813 and 20190818172237.
+Gap of 60s found between 20190818172317 and 20190818172424.
+Gap of 115s found between 20190818172431 and 20190818172633.
+Gap of 74s found between 20190821170341 and 20190821170502.
+
+Average tick interval: 5351 miliseconds.
+Maximum tick interval found: 541782 miliseconds.

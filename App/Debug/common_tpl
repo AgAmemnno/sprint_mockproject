@@ -1,0 +1,44 @@
+[Charts]
+ProfileLast={{Ch.ProfileLast|default("Default", True)}}
+MaxBars={{Ch.MaxBars|default(50000, True)}}
+PrintColor={{Ch.PrintColor|default(0, True)}}
+SaveDeleted={{Ch.SaveDeleted|default(0, True)}}
+TradeLevels={{Ch.TradeLevels|default(1, True)}}
+TradeLevelsDrag={{Ch.TradeLevelsDrag|default(0, True)}}
+ObsoleteLasttime={{Ch.ObsoleteLasttime|default(1538575276, True)}}
+[Common]
+Login={{Co.Login|default(25376369, True)}}
+ProxyEnable={{Co.ProxyEnable|default(0, True)}}
+ProxyType={{Co.ProxyType|default(0, True)}}
+ProxyAddress={{Co.ProxyAddress|default('', True)}}
+ProxyAuth={{Co.ProxyAuth|default('', True)}}
+CertInstall={{Co.CertInstall|default(0, True)}}
+NewsEnable={{Co.NewsEnable|default(1, True)}}
+NewsLanguages={{Co.NewsLanguages|default('', True)}}
+[Experts]
+AllowLiveTrading=1
+AllowDllImport=1
+Enabled=1
+Account=0
+Profile=0
+[Objects]
+ShowPropertiesOnCreate=0
+SelectOneClick=0
+MagnetSens=10
+[Tester]
+Expert={{Te.Expert|default('Ku2\TestIndicator\TestBB_Season', True)}}
+ExpertParameters={{Te.ExpertParameters|default('Ku2\TestIndicator\TestBB\tester_mod.set', True)}}
+Symbol={{Te.Symbol|default('EURUSD', True)}}
+Period={{Te.Period|default('H1', True)}}
+Deposit={{Te.Deposit|default(10000, True)}}
+Model={{Te.Model|default(0, True)}}
+Optimization={{Te.Optimization|default(0, True)}}
+OptimizationCriterion={{Te.OptimizationCriterion|default(0, True)}}
+FromDate={{Te.FromDate|default('2018.01.22', True)}}
+ToDate={{Te.ToDate|default('2018.09.16', True)}}
+Report={{Te.Report|default('\\Tester\\html\\Ku2\\TestIndicator\\TestBB\\UniformTest-BBSimple-EURUSD-2018.01.01\\PROFIT_2', True)}}
+ReplaceReport={{Te.ReplaceReport|default(0, True)}}
+UseLocal={{Te.UseLocal|default(0, True)}}
+Port={{Te.Port|default(3000, True)}}
+Visual={{Te.Visual|default(0, True)}}
+ShutdownTerminal={{Te.ShutdownTerminal|default(0, True)}}
