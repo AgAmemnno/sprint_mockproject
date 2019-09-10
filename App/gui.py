@@ -1,3 +1,9 @@
+import os,sys
+dir = os.getcwd()
+sys.path.append(dir[:-3])
+print("Project Path  %s"%(dir[:-3]))
+
+
 import wx.lib.inspection
 import wx.lib.mixins.inspection
 import matplotlib
@@ -500,6 +506,8 @@ class App(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
 
 
 if __name__ == "__main__":
+    import os
+    print(os.getcwd())
     app  = App("")
     loop = get_event_loop()
     loop.run_until_complete(app.MainLoop())

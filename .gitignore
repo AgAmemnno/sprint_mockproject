@@ -3,3 +3,4 @@ pyopengl
 examples
 ws
 .idea
+App/debug.py
