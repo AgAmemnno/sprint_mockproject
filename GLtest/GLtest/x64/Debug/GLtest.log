@@ -1,2 +1,0 @@
-﻿  GLtest.cpp
-LINK : fatal error LNK1104: ファイル 'glut32.lib' を開くことができません。
