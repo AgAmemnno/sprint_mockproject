@@ -1,9 +1,3 @@
-import os,sys
-dir = os.getcwd()
-sys.path.append(dir[:-3])
-print("Project Path  %s"%(dir[:-3]))
-
-
 import wx.lib.inspection
 import wx.lib.mixins.inspection
 import matplotlib
@@ -13,9 +7,9 @@ matplotlib.use('WXAgg')
 from matplotlib.widgets import Button, RadioButtons
 from matplotlib.font_manager import FontProperties
 
-from App.mock import *
+from p2popt.App.mock import *
 
-from wxasync.wxasync import *
+from p2popt.App.wxasync import *
 
 
 class MockFrame(wx.Frame):
@@ -44,9 +38,6 @@ class MockFrame(wx.Frame):
 
         self.sizer  = wx.BoxSizer()
         self.sizer.Add(self.mock, 1, wx.EXPAND)
-
-
-
 
 class MockControlFrame(wx.Frame):
     def __init__(self, *args, **kwargs):
@@ -118,7 +109,6 @@ class MockControlFrame(wx.Frame):
             loop.create_task(i)
         event.Skip()
 
-
 class MockControlFrame2(wx.Frame):
     def __init__(self, *args, **kwargs):
         wx.Frame.__init__(self,None,-1,args[1], **kwargs)
@@ -155,8 +145,6 @@ class MockControlFrame2(wx.Frame):
         for i in ta:
             loop.create_task(i)
         event.Skip()
-
-
 
 class MockControlFrame3(wx.Frame):
     def __init__(self, *args, **kwargs):
@@ -217,7 +205,6 @@ class MockControlFrame3(wx.Frame):
         for i in ta:
             loop.create_task(i)
         event.Skip()
-
 
 class Gui(wx.Panel):
     def __init__(self, parent):

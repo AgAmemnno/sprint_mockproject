@@ -1,4 +1,4 @@
-import os, sys
+import os
 from setuptools import setup, find_packages
 
 def read_requirements():
@@ -14,8 +14,8 @@ setup(
     description='MockProject for Python Sprint',
     author='AgAmemnno',
     author_email='kaz380@hotmail.co.jp',
-    url='https://github.com/AgAmemnno/sprint_mockproject/tree/dev',
-    license='MIT',
+    url     ='https://github.com/AgAmemnno/sprint_mockproject',
+    license ='MIT',
     install_requires=read_requirements(),
-    packages= find_packages(exclude=('log','GLtest'))
+    packages = find_packages()
 )

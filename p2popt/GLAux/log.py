@@ -6,12 +6,11 @@ import shutil
 from functools import reduce
 
 __all__ = ['Logg','log','LoggUtil',"dictString","mul"]
-
-LOGNAME = {"Log1": 'D:\Python\sprint\log\\file0.log'}
+LOGDIR     = "%s/log"%os.path.dirname(os.path.abspath(__file__))
+LOGNAME = {"Log1": '%s\\file0.log'%LOGDIR}
 
 class LoggUtil:
-    def Clean(dir= 'D:\Python\sprint\log'):
-        #dir = 'F:\MT5\Charm2019\Recognition\Cepstrum\log\ws/'
+    def Clean(dir = LOGDIR):
         if os.path.exists(dir):
             shutil.rmtree(dir)
         os.mkdir(dir)
@@ -19,12 +18,13 @@ class Logg:
     LEVEL  = {"L":5,"D":10,"I":20,"W":30,"E":40,"C":50}
     colors = {'pink': '\033[95m', 'blue': '\033[94m', 'green': '\033[92m', 'yellow': '\033[93m', 'red': '\033[91m',
               'ENDC': '\033[0m', 'bold': '\033[1m', 'underline': '\033[4m','rev':'\x1b[7m'}
-    def __init__(self,cons= True,file= True,name = "Log1",dir = 'F:\MT5\Charm2019\Recognition\Cepstrum\log\ws/'):
+    def __init__(self,cons= True,file= True,name = "Log1"):
+        global LOGDIR
         self.C = False
         self.F = False
         if file:
             if name not in LOGNAME:
-                LOGNAME[name] = dir + name + '.log'
+                LOGNAME[name] = "%s/%s.log"%(LOGDIR,name)
             self.flg = logging.getLogger(name)
             stream_handler2 = FileHandler(filename= LOGNAME[name])
             #stream_handler2.setLevel(logging.DEBUG)

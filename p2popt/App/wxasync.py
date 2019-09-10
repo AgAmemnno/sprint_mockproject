@@ -95,7 +95,6 @@ class WxAsyncApp(wx.App):
                         warnings.warn("cancelling callback" + str(obj) + str(task))
                 del self.BoundObjects[task.obj]
 
-
 def AsyncBind(event, async_callback, object, source=None, id=wx.ID_ANY, id2=wx.ID_ANY):
     app = wx.App.Get()
     if not isinstance(app, WxAsyncApp):
@@ -107,7 +106,6 @@ def StartCoroutine(coroutine, obj,id =0):
     if not isinstance(app, WxAsyncApp):
         raise Exception("Create a 'WxAsyncApp' first")
     app.StartCoroutine(coroutine, obj,id)
-
 
 async def AsyncShowDialog(dlg):
     closed = Event()

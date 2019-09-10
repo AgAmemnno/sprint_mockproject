@@ -1,12 +1,19 @@
-from GLAux.log import *
+from p2popt.GLAux.log import *
 from OpenGL.GL import *
 from OpenGL.GL.shaders import *
 import subprocess
 
 class Smi:
     def __init__(self):
-        pass
+        self.on = True
+        try:
+            cmd = 'nvidia-smi --query-gpu=utilization.gpu --format=csv'
+            output = subprocess.check_output(cmd, shell=True)
+        except:
+            log.Error("No nvidia-smi ")
+            self.on = False
     def utilization(self):
+        if not self.on:return 0
         cmd = 'nvidia-smi --query-gpu=utilization.gpu --format=csv'
         output = subprocess.check_output(cmd, shell=True)
         return float(output.decode().split('\n')[1].strip()[:-1])
@@ -58,5 +65,3 @@ class Spec:
 
         #print(glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS,0))
         log.Info("ComputeShaderSpec \n%s"%dictString(self.comp))
-
-

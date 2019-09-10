@@ -1,13 +1,14 @@
 import wx.glcanvas as glcanvas
-from wxasync.wxasync import *
+
 import wx.lib.sized_controls as sc
 
-from GLAux.compile import *
-from GLAux.query import *
-from GLAux.parser import *
-from GLAux.vao import *
-from App.ssbo import *
-from App.debug import *
+from p2popt.App.wxasync import *
+from p2popt.GLAux.compile import *
+from p2popt.GLAux.parser import *
+from p2popt.GLAux.query import *
+from p2popt.GLAux.vao import *
+from p2popt.App.ssbo import *
+from p2popt.App.debug import *
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -2482,8 +2483,6 @@ class MockSettingVisualizer(sc.SizedDialog):
     def GetValue(self):
         return
 
-
-
 class MockSettingAsset(sc.SizedDialog):
     def __init__(self, parent, id):
         sc.SizedDialog.__init__(self, None, -1, "Setting",
@@ -2742,7 +2741,6 @@ class MockSettingAsset(sc.SizedDialog):
     def GetValue(self):
         return
 
-
 class MockSettingApp(sc.SizedDialog):
     def __init__(self, parent, id):
         sc.SizedDialog.__init__(self, None, -1, "Setting",
@@ -2987,7 +2985,7 @@ class MockSettingApp(sc.SizedDialog):
         return
 
 if __name__ == "__main__":
-    from GLAux.parser import *
+    from p2popt.GLAux.parser import *
     cr = ConstRender()
     CONST = {
         "SHXTH": 256,

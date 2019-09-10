@@ -3,4 +3,7 @@ pyopengl
 examples
 ws
 .idea
-App/debug.py
+p2popt/App/debug.py
+p2popt/App/Debug
+p2popt/App/__config.py
+GLtest

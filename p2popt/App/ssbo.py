@@ -3,20 +3,23 @@ import os
 from OpenGL.GL import *
 from OpenGL.GL.shaders import *
 
-from GLAux.log import *
-from App.config import *
+from p2popt.GLAux.log import *
+from p2popt.App.config import *
 import json
 
 
 class Sampler:
     def __init__(self,seed):
         self.seed      = seed
+        home           = os.path.expanduser("~")
+        home           = "%s\%s"%(home[:2],home[2:])
         self.name      =  config["ID_json"]
         self.num       = 0
+
         self.choiceNum = -1
         self.fix       = -1
-        self.path   = config["dir_json"]
-
+        self.path   = "%s/%s/"%(home,config["dir_json"])
+        log.Info("DownLoads Directory %s"%self.path)
         self.para_range = param_range
         self.vth        = len(param_range)
         self.sep        = 4
@@ -79,7 +82,7 @@ class Sampler:
     def readIni(self,n):
         fn = "%sinit.json" % (self.path)
         if not os.path.isfile(fn):
-            log.Error("inifile Not exist!!")
+            log.Error("inifile Not exist!!  %s"%fn)
             return False
         else:
             with open(fn, mode='r') as f:
@@ -147,14 +150,16 @@ class Ssbo:
             del self.Prop[i]
         log.Info("Ssbo Destroy %s"%keys)
     def load_mt(self):
-        path = "D:\Python\sprint\Data\GBPAUD_M1_201908.csv"
+        dir = os.path.dirname(os.path.abspath(__file__))
+        path = "%s/Data/GBPAUD_M1_201908.csv"%dir
         data = np.loadtxt(path, delimiter="\t", skiprows=1, usecols=(2, 3, 4, 5))
         return np.hstack((np.arange(len(data)).reshape(len(data), 1), data))
     def Set_data(self,name="data",bbid= 3,mt = False):
+        dir = os.path.dirname(os.path.abspath(__file__))
         if mt:
             data = self.load_mt()
         else:
-            data = np.loadtxt(config[name],delimiter=",",skiprows=0,usecols=(1, 2, 3, 4, 5))
+            data = np.loadtxt("%s/Data/%s"%(dir,config[name]),delimiter=",",skiprows=0,usecols=(1, 2, 3, 4, 5))
         log.Log("DATA   min %.6f max %.6f"%(data[:,4].min(),data[:,4].max()))
         self.data  = data.astype(np.float)
         nbyte = data.data.nbytes

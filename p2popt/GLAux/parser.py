@@ -1,4 +1,4 @@
-from GLAux.log import *
+from p2popt.GLAux.log import *
 from jinja2 import Template, Environment, FileSystemLoader
 import re
 

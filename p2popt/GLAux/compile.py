@@ -1,5 +1,6 @@
-from GLAux.log import *
-from GLAux.parser import *
+from p2popt.GLAux.log import *
+from p2popt.GLAux.parser import *
+
 from OpenGL.GL import *
 from OpenGL.GL.shaders import *
 
