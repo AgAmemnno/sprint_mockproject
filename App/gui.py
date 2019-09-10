@@ -1,28 +1,15 @@
-import wx.glcanvas as glcanvas
-import wx
 import wx.lib.inspection
 import wx.lib.mixins.inspection
-import numpy as np
 import matplotlib
 
 matplotlib.interactive(True)
 matplotlib.use('WXAgg')
-from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg
-from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
-from matplotlib.widgets import Slider, Button, RadioButtons,TextBox
-import matplotlib.dates as mdates
+from matplotlib.widgets import Button, RadioButtons
 from matplotlib.font_manager import FontProperties
 
-
-
-
-from GLAux.log import *
-from App.config import *
 from App.mock import *
 
 from wxasync.wxasync import *
-
 
 
 class MockFrame(wx.Frame):
@@ -130,10 +117,8 @@ class MockControlFrame2(wx.Frame):
     def __init__(self, *args, **kwargs):
         wx.Frame.__init__(self,None,-1,args[1], **kwargs)
         #print(args,kwargs)
-
         self.mock = Mock(self,size = kwargs["size"])
         self.gui = args[2]
-
 
         self.sizer = wx.BoxSizer()
         self.sizer.Add(self.mock, 1, wx.EXPAND)
@@ -166,11 +151,74 @@ class MockControlFrame2(wx.Frame):
         event.Skip()
 
 
+
+class MockControlFrame3(wx.Frame):
+    def __init__(self, *args, **kwargs):
+        wx.Frame.__init__(self,None,-1,args[1], **kwargs["option"])
+        #print(args,kwargs)
+        self.SetBackgroundColour(wx.Colour(12,12,12))
+        self.mock  = Mock(self, size = (1500,800))
+        self.vis   = Mock(self, size = (1500,800))
+
+        self.shid  = kwargs["shid"]
+        self.batch = kwargs["batch"]
+
+        self.sizer = wx.GridSizer(rows=2,cols=1,vgap=1,hgap=1)
+        self.sizer.Add(self.vis, 1,wx.EXPAND)
+        self.sizer.Add(self.mock, 1,wx.EXPAND)
+
+        self.SetSizer(self.sizer)
+
+        #self.Fit()
+        #self.sizer.Add(self.vis, 1, wx.EXPAND)
+        #self.SetSizerAndFit(self.sizer)
+
+        mb    = wx.MenuBar()
+        menu1 = wx.Menu()
+
+        item = wx.MenuItem(menu1, wx.ID_ANY, "&TestAsset")
+        menu1.Append(item)
+        self.Bind(wx.EVT_MENU, self.OnTestAsset, item)
+
+        item = wx.MenuItem(menu1, wx.ID_ANY, "&TestVisual")
+        menu1.Append(item)
+        self.Bind(wx.EVT_MENU, self.OnTestVisual, item)
+
+        mb.Append(menu1, "&Menu")
+        self.SetMenuBar(mb)
+        self.Show()
+
+        self.exe_dlg = None
+    async def mock1dlg(self,n):
+        if n ==0:
+            self.mock1_dlg = MockSettingApp(self, 0)
+        if n ==1:
+            self.mock1_dlg = MockSettingVisualizer(self, 1)
+
+        return_code = await AsyncShowDialog(self.mock1_dlg)
+        Date = self.mock1_dlg.GetValue()
+    def OnTestAsset(self, event):
+        loop = get_event_loop()
+        ta = []
+        ta.append(self.mock1dlg(0))
+        for i in ta:
+            loop.create_task(i)
+        event.Skip()
+    def OnTestVisual(self, event):
+        loop = get_event_loop()
+        ta = []
+        ta.append(self.mock1dlg(1))
+        for i in ta:
+            loop.create_task(i)
+        event.Skip()
+
+
 class Gui(wx.Panel):
     def __init__(self, parent):
         self.parent = parent
         wx.Panel.__init__(self, parent, -1)
         self.TestDouble2()
+
     def TestDouble1(self):
 
         font = FontProperties()
@@ -234,6 +282,7 @@ class Gui(wx.Panel):
             print('Closed Figure!')
 
         self.figure.canvas.mpl_connect('close_event', handle_close)
+
     def TestDouble2(self):
 
         font = FontProperties()
@@ -241,12 +290,12 @@ class Gui(wx.Panel):
         font.set_weight('semibold')  # ['light', 'normal', 'medium', 'semibold', 'bold', 'heavy', 'black']
         font.set_size('xx-large')  # ['xx-small', 'x-small', 'small', 'medium', 'large','x-large', 'xx-large']
 
-        self.bbox = {'facecolor': [0.18, 0.18, 0.18], 'alpha': 0.2, 'pad': 2}
-        self.font = font
+        self.bbox   = {'facecolor': [0.18, 0.18, 0.18], 'alpha': 0.2, 'pad': 2}
+        self.font   = font
         self.figure = plt.figure(0)
         self.figure.canvas.set_window_title(config["name"])
         self.figure.set_facecolor((0.188, 0.18, 0.18))
-        axcolor  = (0.175,0.18,0.18)
+        axcolor     = (0.175,0.18,0.18)
 
         x = 0.2
         w = 0.1
@@ -272,8 +321,9 @@ class Gui(wx.Panel):
         resetax = plt.axes([x, y - 0.1, w ,h +0.1],facecolor=axcolor)
         font.set_size('small')
         resetax.set_title("SharedMemory", fontproperties=font)
-        self.shspec = RadioButtons(resetax, ('16','32','64', '128', '256'), active=2)
+        self.shspec = RadioButtons(resetax, ('16','32','64', '128', '256'), active=1)
         self.shspec.on_clicked(shspec)
+        self.shth = 32
 
 
 
@@ -293,16 +343,16 @@ class Gui(wx.Panel):
         resetax = plt.axes([x, y - 0.1, w ,h +0.1],facecolor=axcolor)
         font.set_size('small')
         resetax.set_title("BatchSize", fontproperties=font)
-        self.batchsize = RadioButtons(resetax, ('5','10','50','100'), active=2)
+        self.batchsize = RadioButtons(resetax, ('5','10','50','100'), active=1)
         self.batchsize.on_clicked(batchsize)
 
 
         x = 0.2
         w = 0.1
-        y = 0.15
+        y = 0.1
         h = 0.05
         resetax = plt.axes([x, y, w+0.1, h])
-        font.set_size('xx-large')
+        font.set_size('x-large')
         resetax.set_title("Test Visualize\n",fontproperties=font)
         self.bTest7 = Button(resetax, 'TestFrame', color=axcolor, hovercolor='0.575')
         self.bTest7.on_clicked(self.OnTest7)
@@ -310,13 +360,24 @@ class Gui(wx.Panel):
 
         x = 0.6
         w = 0.1
-        y = 0.15
+        y = 0.3
         h = 0.05
         resetax = plt.axes([x, y, w+0.1, h])
-        font.set_size('xx-large')
+        font.set_size('x-large')
         resetax.set_title("Test InOut\n",fontproperties=font)
         self.bTestinout = Button(resetax, 'TestFrame', color=axcolor, hovercolor='0.575')
         self.bTestinout.on_clicked(self.OnTestInout)
+
+
+        x = 0.6
+        w = 0.1
+        y = 0.1
+        h = 0.05
+        resetax = plt.axes([x, y, w+0.1, h])
+        font.set_size('x-large')
+        resetax.set_title("Test App\n",fontproperties=font)
+        self.bStartUp = Button(resetax, 'StartUp', color=axcolor, hovercolor='0.575')
+        self.bStartUp.on_clicked(self.OnStartUp)
 
 
         self.ax1  = self.figure.add_subplot(222)
@@ -326,6 +387,8 @@ class Gui(wx.Panel):
             #self.timer.Stop()
             self.parent.Destroy()
             print('Closed Figure!')
+
+
 
         self.figure.canvas.mpl_connect('close_event', handle_close)
     """
@@ -352,7 +415,6 @@ class Gui(wx.Panel):
         plt.title("beta")
 
     """
-
     def OnTest1(self, evt):
         #frame = Gui(None, -1, "Mock: ", size=(500, 500),style=wx.DEFAULT_FRAME_STYLE, name="run a sample")
         frame =  MockFrame(1,"Test1",size=(500, 500),style=wx.DEFAULT_FRAME_STYLE, name="run a sample")
@@ -395,10 +457,19 @@ class Gui(wx.Panel):
 
     def OnTestInout(self, evt):
         # frame = Gui(None, -1, "Mock: ", size=(500, 500),style=wx.DEFAULT_FRAME_STYLE, name="run a sample")
-        frame = MockControlFrame2(0, "TestInout", self, size=(1500, 400), style=wx.DEFAULT_FRAME_STYLE,
+        frame = MockControlFrame2(0, "TestInout", self, size=(400, 400), style=wx.DEFAULT_FRAME_STYLE,
                                  name="run a sample")
         frame.Show()
 
+    def OnStartUp(self, evt):
+        frameobj = {
+            "size" : (800, 400),
+            "style" : wx.DEFAULT_FRAME_STYLE
+        }
+        log.Info("StartUP BlockSize %d  BatchSize %d "%( self.shth,self.batch))
+        frame = MockControlFrame3(0, "TestApp", option = frameobj,shid = self.shth,batch =self.batch)
+        frame.Show()
+        plt.close(0)
 
 class App(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
     def __init__(self, name):
@@ -432,5 +503,4 @@ if __name__ == "__main__":
     app  = App("")
     loop = get_event_loop()
     loop.run_until_complete(app.MainLoop())
-
 

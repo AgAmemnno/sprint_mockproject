@@ -1,17 +1,11 @@
 import wx.glcanvas as glcanvas
-import wx
 from wxasync.wxasync import *
 import wx.lib.sized_controls as sc
-
-from OpenGL.GL import *
-from OpenGL.GL.shaders import *
 
 from GLAux.compile import *
 from GLAux.query import *
 from GLAux.parser import *
 from GLAux.vao import *
-from GLAux.log import *
-from App.config import *
 from App.ssbo import *
 from App.debug import *
 
@@ -72,67 +66,6 @@ class TestObserver:
 
 TO = TestObserver()
 
-class Sampler:
-    def __init__(self,seed,para_ra,sep=4):
-        self.seed = seed
-        self.para_range = para_ra
-        self.vth        = len(para_ra)
-        self.sep = 4
-        np.random.seed(seed)
-        self.fig = plt.figure(100)
-        self.ax = self.fig.add_subplot(111)
-        plt.show()
-    def initSeed(self):
-        np.random.seed(self.seed)
-    def randint(self,n):
-        for i, a in enumerate(self.para_range):
-            p = a[0] + a[2] * np.random.randint(0, (a[1] - a[0]) / a[2], n)
-            #print(i,"  range ",a,"  param  ",p)
-            if i == 0:
-                l = p
-            else:
-                l = np.vstack((l, p))
-        return np.vstack((l, np.zeros(n))).T
-    def roundmax(self,oarg,param,samp_ra,samp_num):
-        pid = np.random.choice(np.arange(self.vth), samp_num,replace=False)
-        mx = param[oarg[:self.sep], :8]
-        for i in range(self.sep):
-            log.Info("MaxParameter %s     result %.3f"%(mx[i].tolist(),param[oarg[i], 8]))
-
-        n  = param.shape[0]
-        N  = n//self.sep
-        for i, a in enumerate(self.para_range):
-            if i in pid:
-                ra = int(samp_ra * (a[1] - a[0]) / a[2])
-                p = []
-                for j in range(self.sep):
-                    mu = mx[j,i] - ra / 2
-                    if mu < a[0]: mu = a[0]
-                    log.Log("sampling mu %.4f  0-%d  %d "%(mu,ra,N))
-                    p += (mu + a[2] * np.random.randint(0, ra, N)).tolist()
-            else:
-                p = []
-                for j in range(self.sep):
-                    p += (np.ones(N)*mx[j,i]).tolist()
-
-            if i == 0:
-                l = p
-            else:
-                l = np.vstack((l, p))
-
-        return np.vstack((l, np.zeros(n))).T
-    def result(self,asset):
-        self.ax.cla()
-        def onpick3(event):
-            ind = event.ind
-            log.Info('Output : path %s  result %s'%(ind, asset[ind]))
-        col = self.ax.scatter(np.arange(len(asset)),asset,picker=True)
-        # fig.savefig('pscoll.eps')
-        self.fig.canvas.mpl_connect('pick_event', onpick3)
-
-        #plt.plot(asset)
-        # log.Log("x  %s"%asset[i, 0, 1:l].tolist())
-        # log.Log("y  %s"%asset[i, 1, 1:l].tolist())
 
 
 class Mock(glcanvas.GLCanvas):
@@ -176,7 +109,9 @@ class Mock(glcanvas.GLCanvas):
                 self.Test_DrawAsset()
         event.Skip()
     def DoSetViewport(self):
+
         size = self.size = self.GetClientSize()
+        #print("onsize ", size)
         self.SetCurrent(self.context)
         glViewport(0, 0, size.width, size.height)
     def Call(self,N):
@@ -228,7 +163,10 @@ class Mock(glcanvas.GLCanvas):
             self.pipe_fatou = None
         #self.pipe.delete()
         #self.vao.delete()
-        log.Info('Mock Destroy <====  ' + self.TYPE)
+        if self.TYPE == None:
+            log.Info('Mock Destroy')
+        else:
+            log.Info('Mock Destroy <====  ' + self.TYPE)
         if event != None:event.Skip()
     def uniform(self,n,val= None):
 
@@ -826,7 +764,7 @@ class Mock(glcanvas.GLCanvas):
     def Test_Draw4(self):
         stid = self.stid
         wth = self.wth  # self.TOTAL
-        #log.Log("TestDraw4  STID  %d  WTH   %d" % (stid, wth))
+        log.Log("TestDraw4  STID  %d  WTH   %d" % (stid, wth))
         self.Test_Draw3(stid, wth)
     def Test_Draw3(self,stid,lth):
 
@@ -870,6 +808,8 @@ class Mock(glcanvas.GLCanvas):
         glClearColor(0, 0, 0, 1)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
+
+        glProgramUniform3f(*self.pipe.vloc("Seed"), *np.random.randn(3).tolist())
         glProgramUniform2f(*self.pipe.vloc("res"), float(self.size.width), float(self.size.height))
         glProgramUniform1i(*self.pipe.vloc("TYPE"), 0)
 
@@ -1217,7 +1157,7 @@ class Mock(glcanvas.GLCanvas):
         self.comp.name = {'T10': 0 ,"PP" : 1}
 
         vert     = "../GLAux/glsl\\Mock\\VS\\T2.glsl"
-        frag     = "../GLAux/glsl\\Mock\\FS\\T0.glsl"
+        frag     = "../GLAux/glsl\\Mock\\FS\\T1.glsl"
 
 
         self.pipe = Pipe([vert, frag], [GL_VERTEX_SHADER, GL_FRAGMENT_SHADER])
@@ -1259,7 +1199,6 @@ class Mock(glcanvas.GLCanvas):
         self.frame.Destroy()
         gc.collect()
         self.iniDraw = True
-
     def TestAsset(self):
         # Global Memory vs Shared Memory
         if self.active == "Tasset":return
@@ -1334,14 +1273,13 @@ class Mock(glcanvas.GLCanvas):
         self.comp.name = {'Tasset': 0 ,"PP" : 1}
 
         vert     = "../GLAux/glsl\\Mock\\VS\\T2.glsl"
-        frag     = "../GLAux/glsl\\Mock\\FS\\T0.glsl"
+        frag     = "../GLAux/glsl\\Mock\\FS\\T1.glsl"
 
         self.pipe = Pipe([vert, frag], [GL_VERTEX_SHADER, GL_FRAGMENT_SHADER])
         self.vao =  Vao()
         self.vao.pos2d()
 
-        self.Samp = Sampler(12345,param_range)
-
+        self.Samp = Sampler(12345)
         #self.ssbo.Set_AC(size = self.Shid*mul(disp))
 
         gc.collect()
@@ -1358,10 +1296,11 @@ class Mock(glcanvas.GLCanvas):
 
         glUniform1i(glGetUniformLocation(self.comp.PG[self.comp.name['Tasset']], "PID"), -1)
         glUniform1i(glGetUniformLocation(self.comp.PG[self.comp.name['Tasset']], "VIS_MODE"), 2)
-
         glUniform1i(glGetUniformLocation(self.comp.PG[self.comp.name['Tasset']], "PARA_MODE"), para_mode)
+
         if para_mode == 1:
-            self.Test_Input(mode)
+            if not self.Test_Input(mode):
+                return False
         #self.Test_Input()
 
         start = time.time()
@@ -1375,15 +1314,13 @@ class Mock(glcanvas.GLCanvas):
             ac = self.ssbo.G2C(tag="np_ac").reshape(self.disp[1] * self.disp[2], self.Shid)
             if True:
                 for i in range(self.disp[1] * self.disp[2]):
-                    log.Log("Test asset  Dealing  blocksize %d batchsize %d dispatch %s  init 10**6  YZID %d  result %s  " % (
-                    self.Shid, self.batch,self.disp, i, ac[i, :]))
+                    log.Log("Test asset  Dealing  blocksize %d batchsize %d dispatch %s  init 10**6  YZID %d  result %s  " % (self.Shid, self.batch,self.disp, i, ac[i, :]))
 
         elapsed_time = time.time() - start
-        log.Warning(
-            "Test asset Result shared (%d) dispatch (%d , %d  , %d) %d times  Inner(%d times)  elapsed_time:%.4f[sec]  CheckSum %s  " % (
+        log.Warning("Test asset Result shared (%d) dispatch (%d , %d  , %d) %d times  Inner(%d times)  elapsed_time:%.4f[sec]  CheckSum %s  " % (
                 self.Shid, self.disp[0], self.disp[1], self.disp[2], N, self.TOTAL, elapsed_time, csum))
-
         #self.Test_Input("out")
+        return True
     def Test_DrawAsset(self):
 
         stid = 0
@@ -1404,18 +1341,7 @@ class Mock(glcanvas.GLCanvas):
             log.Log("Entry Array  %s"%[dprop[i].ry[j] for j in range(2)])
         #log.Log("Exit Array  %s" % [dprop[0].exit[i + 1] for i in range(dprop[0].exit[0])])
         asset = self.ssbo.G2C(tag="np_asset")
-        """
-        import matplotlib.pyplot as plt
-        plt.figure()
-        for i in range(len(asset)):
-            l = int(asset[i, 0, 0])
-            #print(i," lth  ",l)
-            if l > 300:l = 300
-            plt.plot(asset[i, 0, 1:l],asset[i, 1, 1:l])
-            #log.Log("x  %s"%asset[i, 0, 1:l].tolist())
-            #log.Log("y  %s"%asset[i, 1, 1:l].tolist())
-        plt.show()
-        """
+
         self.pipe.bind()
         self.vao.bind()
         glEnable(GL_BLEND)
@@ -1426,17 +1352,19 @@ class Mock(glcanvas.GLCanvas):
         glClearColor(0, 0, 0, 1)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
+        glProgramUniform3f(*self.pipe.vloc("Seed"), *np.random.randn(3).tolist());
         glProgramUniform2f(*self.pipe.vloc("res"), float(self.size.width), float(self.size.height))
         glProgramUniform1i(*self.pipe.vloc("TYPE"), 0)
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
 
         glProgramUniform1i(*self.pipe.vloc("FULL"), int(self.FULL))
+
         if self.FULL == 0:
             glProgramUniform1i(*self.pipe.vloc("TYPE"), 10)
             glDrawArraysInstanced(GL_LINES, 0, 2, 2)  # self.voxsize[1]);
-
         #log.Info("##################Draw Status  FULL %d SEPID %d  Total %d " % (self.FULL,self.sepid,self.TOTAL))
+
 
         for i in range(4):
 
@@ -1452,8 +1380,7 @@ class Mock(glcanvas.GLCanvas):
                 #glDrawArraysInstanced(GL_POINTS, 0, 1, int(lth))
 
 
-
-        self.Test_Input("out")
+        #self.Test_Input("out")
 
         self.after()
         self.redraw = 3
@@ -1472,14 +1399,19 @@ class Mock(glcanvas.GLCanvas):
         if mode == "ini":
 
             param = self.Samp.randint(N*mul(self.disp))
-            #param = np.arange(N*mul(self.disp)*9).reshape(N*mul(self.disp),9).astype(np.float)
-            #param = np.ones(N * mul(self.disp) * 9).reshape(N * mul(self.disp), 9).astype(np.float32)
             self.ssbo.G2C("set_io", param)
-            #for i in range(len(param)):
+
+        elif mode == "iniJson":
+
+            param = self.Samp.readIni(N*mul(self.disp))
+            if type(param) == bool:
+                return False
+            self.ssbo.G2C("set_io", param)
+
         elif mode == "max" :
+
             self.SetCurrent(self.context)
             param = self.ssbo.G2C("np_io")
-
             o    = param[:, 8].flatten()
             log.Log("param output  %s" %o.tolist())
             oarg = np.argsort(o)[::-1]
@@ -1489,7 +1421,7 @@ class Mock(glcanvas.GLCanvas):
         elif mode == "out":
             param = self.ssbo.G2C("np_io")
             o = param[:, 8].flatten() #.reshape(mul(self.disp),N)
-            self.Samp.result(o)
+            #self.Samp.result(o)
             #for i in range(mul(self.disp)):
             #    self.Samp.result(o[i,:])
         else:
@@ -1499,7 +1431,8 @@ class Mock(glcanvas.GLCanvas):
         log.Warning("%d th  output %.3f input %s"%(i, param[i, 8], param[i, :8]))
         i = N*mul(self.disp)-1
         log.Warning("%d th  output %.3f input %s"%(i, param[i, 8], param[i, :8]))
-    def TestVisual(self):
+        return True
+    def TestVisual(self,shid =16,batch =5):
         # Global Memory vs Shared Memory
         if self.active == "TVisual":return
         self.TYPE = "TestVisual"
@@ -1510,8 +1443,8 @@ class Mock(glcanvas.GLCanvas):
         log.Info("Start TestVisual Shader Dealing ")
 
         self.disp = disp = [1, 2, 2]
-        self.Shid  = self.frame.gui.shth
-        self.batch = self.frame.gui.batch
+        self.Shid  = shid
+        self.batch = batch
         self.sep   = mul(self.disp)
         self.vth = 8
 
@@ -1641,6 +1574,155 @@ class Mock(glcanvas.GLCanvas):
             plt.legend()
 
             plt.show()
+
+    def TestApp(self):
+        # Global Memory vs Shared Memory
+        if self.active == "Tasset":return
+        self.TYPE = "Tasset"
+        if self.active != None:
+            self.OnDestroy(None)
+            self.active = None
+
+        log.Info("Start Tasset Shader Dealing ")
+
+        self.disp = disp = [1, 2, 2]
+        self.Shid  = self.frame.shid
+        self.deal_size = 200
+        self.batch = self.frame.batch
+        self.vth   = 8
+
+
+        self.SetCurrent(self.context)
+        self.ssbo = Ssbo()
+        self.ssbo.Set_data(mt = True)
+        self.ssbo.Set_Vis()
+        self.ssbo.Set_Dprop2()
+        self.ssbo.Set_AC(size=self.Shid * mul(disp))
+        self.ssbo.Set_Asset(sep = mul(disp),shid = self.Shid,batch = self.batch)
+        self.ssbo.Set_InOut(sep = mul(disp),shid = self.Shid,batch = self.batch, vth=self.vth)
+
+        self.SHRTH = 2048
+        self.TOTAL = self.ssbo.Prop["data"][3][0]
+
+        cr = ConstRender()
+
+        CONST = {
+            "SHXTH": self.Shid,
+            "SHYTH": 1,
+            "SHZTH": 1,
+            "SHRTH": self.SHRTH,
+            "TOTAL": self.TOTAL
+        }
+
+        cr.render("Mock1/parameter.tpl", CONST)
+
+        CONST = {
+            "SHXTH": self.Shid,
+            "SHYTH": 1,
+            "SHZTH": 1,
+            "SHRTH": self.SHRTH,
+            "TOTAL": self.TOTAL
+        }
+
+        cr.render("Mock1/parameter_vf.tpl", CONST)
+
+
+        CONST = {
+            "SEPARATE"   : disp[1]*disp[2],
+            "DEALTH"  : self.deal_size,
+            "ASSETTH":  int(self.deal_size*1.5),
+            "BATCHTH" : self.batch,
+        }
+
+        cr.render("Visual/mock2_buffer.tpl", CONST)
+
+
+        CONST = {
+            "VTH"   : self.vth,
+        }
+
+        cr.render("Mock1/inout.tpl", CONST)
+
+        Tasset            = "../GLAux/glsl/Mock/Tasset.glsl"
+        prepro         = "../GLAux/glsl/Mock/VS/prepro_T2.glsl"
+        self.comp      = Compute([Tasset,prepro])
+        self.comp.name = {'Tasset': 0 ,"PP" : 1}
+
+        vert     = "../GLAux/glsl\\Mock\\VS\\T2.glsl"
+        frag     = "../GLAux/glsl\\Mock\\FS\\T1.glsl"
+
+        self.pipe = Pipe([vert, frag], [GL_VERTEX_SHADER, GL_FRAGMENT_SHADER])
+        self.vao =  Vao()
+        self.vao.pos2d()
+
+        self.Samp = Sampler(12345)
+
+        #self.ssbo.Set_AC(size = self.Shid*mul(disp))
+
+        gc.collect()
+        self.iniDraw = True
+    def TestAppVisual(self,shid =16,batch =5):
+        # Global Memory vs Shared Memory
+        if self.active == "TVisual":return
+        self.TYPE = "TestVisual"
+        if self.active != None:
+            self.OnDestroy(None)
+            self.active = None
+
+        log.Info("Start TestVisual Shader Dealing ")
+
+        self.disp = disp = [1, 2, 2]
+        self.Shid  = shid
+        self.batch = batch
+        self.sep   = mul(self.disp)
+        self.vth = 8
+
+        self.SetCurrent(self.context)
+        self.ssbo = Ssbo()
+        self.ssbo.Set_data(mt = True)
+        self.ssbo.Set_Vis()
+        self.ssbo.Set_Dprop2()
+        self.ssbo.Set_AC(size=self.Shid * mul(disp))
+        self.ssbo.Set_InOut(sep=mul(disp), shid=self.Shid, batch=self.batch, vth=self.vth)
+
+        self.SHRTH = 2048
+        self.TOTAL = self.ssbo.Prop["data"][3][0]
+
+
+        cr = ConstRender()
+        CONST = {
+            "SHXTH": self.Shid,
+            "SHYTH": 1,
+            "SHZTH": 1,
+            "SHRTH": self.SHRTH,
+            "TOTAL": self.TOTAL
+        }
+        cr.render("Mock1/parameter.tpl", CONST)
+
+
+        CONST = {
+            "SEPARATE": disp[1]*disp[2],
+        }
+
+        cr.render("Visual/mock1_buffer.tpl", CONST)
+
+        TVis       = "../GLAux/glsl/Mock/Tvisual.glsl"
+        prepro   = "../GLAux/glsl/Mock/VS/prepro_T1.glsl"
+        self.comp      = Compute([TVis,prepro])
+        self.comp.name = {'TVisual': 0 ,"PP" : 1}
+
+        vert     = "../GLAux/glsl\\Mock\\VS\\T2.glsl"
+        fatou    = "../GLAux/glsl\\Mock\\FS\\fatou.glsl"
+        frag     = "../GLAux/glsl\\Mock\\FS\\T1.glsl"
+        self.pipe_fatou = Pipe([vert, fatou], [GL_VERTEX_SHADER, GL_FRAGMENT_SHADER])
+        self.pipe = Pipe([vert, frag], [GL_VERTEX_SHADER, GL_FRAGMENT_SHADER])
+        self.vao =  Vao()
+        self.vao.pos2d()
+
+
+        #self.ssbo.Set_AC(size = self.Shid*mul(disp))
+        self.active = "TVisual"
+        self.iniDraw = True
 
 
 
@@ -2189,9 +2271,12 @@ class MockSettingVisualizer(sc.SizedDialog):
         sc.SizedDialog.__init__(self, None, -1, "Setting",
                                 style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
 
-        self._ = parent.mock
-
-        self._.TestVisual()
+        if id == 1:
+            self._ = parent.vis
+            self._.TestAppVisual(parent.shid,parent.batch)
+        else:
+            self._ = parent.mock
+            self._.TestVisual(parent.shid,parent.batch)
 
         bg  = wx.Colour(23, 23, 23, alpha=200)
         fg  = wx.Colour(123, 123, 123, alpha=200)
@@ -2337,8 +2422,7 @@ class MockSettingVisualizer(sc.SizedDialog):
         w.SetForegroundColour(fg)
     def EvtSEP(self,event):
         self._.sepid = event.GetInt()
-        if self._.vis == 1:
-            if self._.calcTVisual:self._.Test_Draw4()
+        if self._.calcTVisual:self._.Test_Draw4()
         #print(self._.sepid)
     def EvtDrawMode(self, event):
         if event.GetInt() == 0:
@@ -2351,8 +2435,8 @@ class MockSettingVisualizer(sc.SizedDialog):
         # print(self._.sepid)
     def EvtWTH(self,event):
         self._.wth = int(self.WTH[event.GetInt()])
-        if self._.vis == 1:
-            if self._.calcTVisual:self._.Test_Draw4()
+        #if self._.vis == 1:
+        if self._.calcTVisual:self._.Test_Draw4()
     def OnSLIDER(self, event):
         name = event.EventObject.name
         left = event.EventObject.left
@@ -2367,14 +2451,13 @@ class MockSettingVisualizer(sc.SizedDialog):
 
         if name == "pid":
             self.OnPidSlider(None)
-
     def OnTestUV(self, ev):
         self._.TestUV()
         gc.collect()
     def OnSEPFULL(self, ev):
-        if self._.vis == 1:
-            self._.FULL = 1 if self._.FULL == 0 else 0
-            if self._.calcTVisual:self._.Test_Draw4()
+        #if self._.vis == 1:
+        self._.FULL = 1 if self._.FULL == 0 else 0
+        if self._.calcTVisual:self._.Test_Draw4()
     def OnTestRun(self,ev):
         ut = smi.utilization()
         if ut > 80:
@@ -2384,17 +2467,18 @@ class MockSettingVisualizer(sc.SizedDialog):
         self._.Test_CalcTVisual()
         self._.Test_Draw4()
         log.Info("parameters   %s  "%self._.para[self._.pid,:].tolist())
-        self._.Debug_MFI()
+        #self._.Debug_MFI()
     def OnPidSlider(self, ev):
         self._.pid = self.CTRL["pid"].GetValue()
             #log.Log(" Set PID   %d "%self._.pid)
             #self.OnTestVisual(None)
     def OnStidSlider(self, ev):
-        if self._.vis == 1:
-            self._.stid = self.CTRL["stid"].GetValue()
-            if not self._.calcTVisual:
-                self._.Test_CalcTVisual()
-            self._.Test_Draw4()
+        log.Log("StidSlider %d  %d "%(self._.stid,self._.wth))
+        #if self._.vis == 1:
+        self._.stid = self.CTRL["stid"].GetValue()
+        if not self._.calcTVisual:
+            self._.Test_CalcTVisual()
+        self._.Test_Draw4()
     def GetValue(self):
         return
 
@@ -2612,7 +2696,6 @@ class MockSettingAsset(sc.SizedDialog):
         self._.Test_DrawAsset()
 
         self.SetParameter()
-
     def SetParameter(self):
         if self.visual != None:
             self._.OnContext()
@@ -2642,7 +2725,8 @@ class MockSettingAsset(sc.SizedDialog):
             frame = wx.Frame(None, -1, "Visualizer", size=(500, 500),
                              style=wx.DEFAULT_FRAME_STYLE, name="run a sample")
             frame.mock = Mock(frame, size=(500, 500))
-            frame.gui  = self.gui
+            frame.shid  = self.gui.shth
+            frame.batch = self.gui.batch
             self.visual = MockSettingVisualizer(frame, 0)
             frame.Show()
         return_code = await AsyncShowDialog(self.visual)
@@ -2658,6 +2742,249 @@ class MockSettingAsset(sc.SizedDialog):
     def GetValue(self):
         return
 
+
+class MockSettingApp(sc.SizedDialog):
+    def __init__(self, parent, id):
+        sc.SizedDialog.__init__(self, None, -1, "Setting",
+                                style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
+
+        self.gui    = parent
+        self._      = parent.mock
+        self.visual = parent.vis
+
+
+        self._.TestApp()
+
+        bg  = wx.Colour(23, 23, 23, alpha=200)
+        fg  = wx.Colour(123, 123, 123, alpha=200)
+
+        self.SetBackgroundColour(bg)
+        self.SetForegroundColour(fg)
+
+        self.sizer = wx.BoxSizer(wx.VERTICAL)
+
+        self.CTRL = {}
+
+        grid1 = wx.FlexGridSizer(cols=1)
+
+        b_testOut = wx.Button(self, label="TestOut")
+        self.Color(b_testOut, bg, fg)
+        b_testOut.Bind(wx.EVT_BUTTON, self.OnTestOut, b_testOut)
+        grid1.Add(b_testOut)
+
+        self.sizer.Add(grid1, flag=wx.BOTTOM, border=15)
+
+        grid12 = wx.FlexGridSizer(cols=3)
+
+        st = wx.StaticText(self, wx.ID_ANY, "TestSampling")
+        font = wx.Font(10, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        st.SetFont(font)
+        grid12.Add(st)
+
+        b_testRandom = wx.Button(self, label="Random")
+        self.Color(b_testRandom, bg, fg)
+        b_testRandom.Bind(wx.EVT_BUTTON, self.OnTestRandom, b_testRandom)
+        grid12.Add(b_testRandom)
+
+        b_testMax = wx.Button(self, label="Max")
+        self.Color(b_testMax, bg, fg)
+        b_testMax.Bind(wx.EVT_BUTTON, self.OnTestMax, b_testMax)
+        grid12.Add(b_testMax)
+
+        self.sizer.Add(grid12, flag=wx.BOTTOM, border=15)
+
+
+        grid20 = wx.FlexGridSizer(cols=1)
+
+        st = wx.StaticText(self, wx.ID_ANY, "SampleRange")
+        font = wx.Font(10, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        st.SetFont(font)
+        grid20.Add(st)
+        self.sizer.Add(grid20, flag=wx.BOTTOM, border=15)
+
+        grid2 = wx.FlexGridSizer(cols=3)
+
+        self._.samp_ra = 0.5
+        slider = wx.Slider(
+            self, 100, self._.samp_ra, 0, 100, size=(250, -1),
+            style=wx.SL_HORIZONTAL | wx.SL_AUTOTICKS | wx.SL_LABELS
+        )
+        self.Color(slider, bg, fg)
+
+        slider.SetTickFreq(25)
+        slider.Bind(wx.EVT_SLIDER, self.OnSampRaSlider)
+        self.CTRL["samp_ra"] = slider
+
+        grid2.Add(slider)
+        b_sl1 = wx.Button(self, label="<", size=(20, 20))
+        self.Color(b_sl1, bg, fg)
+        b_sl1.Bind(wx.EVT_BUTTON, self.OnSLIDER)
+        b_sl1.name = "samp_ra"
+        b_sl1.left = True
+        grid2.Add(b_sl1)
+        b_sl2 = wx.Button(self, label=">", size=(20, 20))
+        self.Color(b_sl2, bg, fg)
+        b_sl2.name = "samp_ra"
+        b_sl2.left = False
+        b_sl2.Bind(wx.EVT_BUTTON, self.OnSLIDER)
+        grid2.Add(b_sl2)
+
+        self.sizer.Add(grid2, flag=wx.BOTTOM, border=5)
+
+
+
+        grid40 = wx.FlexGridSizer(cols=1)
+
+        st = wx.StaticText(self, wx.ID_ANY, "SampleNum")
+        font = wx.Font(10, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        st.SetFont(font)
+        grid40.Add(st)
+        self.sizer.Add(grid40, flag=wx.BOTTOM, border=15)
+
+        grid4 = wx.FlexGridSizer(cols=3)
+
+        self._.samp_num = self._.vth
+        slider = wx.Slider(
+            self, 100, self._.samp_num, 1, self._.vth, size=(250, -1),
+            style=wx.SL_HORIZONTAL | wx.SL_AUTOTICKS | wx.SL_LABELS
+        )
+        self.Color(slider, bg, fg)
+
+        slider.SetTickFreq(1)
+        slider.Bind(wx.EVT_SLIDER, self.OnSampNumSlider)
+        self.CTRL["samp_num"] = slider
+
+        grid4.Add(slider)
+        b_sl1 = wx.Button(self, label="<", size=(20, 20))
+        self.Color(b_sl1, bg, fg)
+        b_sl1.Bind(wx.EVT_BUTTON, self.OnSLIDER)
+        b_sl1.name = "samp_num"
+        b_sl1.left = True
+        grid4.Add(b_sl1)
+        b_sl2 = wx.Button(self, label=">", size=(20, 20))
+        self.Color(b_sl2, bg, fg)
+        b_sl2.name = "samp_num"
+        b_sl2.left = False
+        b_sl2.Bind(wx.EVT_BUTTON, self.OnSLIDER)
+        grid4.Add(b_sl2)
+
+        self.sizer.Add(grid4, flag=wx.BOTTOM, border=5)
+
+
+
+
+        grid3 = wx.FlexGridSizer(cols=5)
+
+        self._.FULL = 0
+        b_sf = wx.Button(self, label="sep/full", size=(60, 40))
+        self.Color(b_sf, bg, fg)
+        b_sf.Bind(wx.EVT_BUTTON, self.OnSEPFULL)
+        grid3.Add(b_sf)
+        grid3.Add(size=(20, 20))
+
+        self.SEP = ["0","1","2","3"]
+        self._.sepid = 0
+        rb = wx.RadioBox(self, wx.ID_ANY, 'separateID',
+                                choices=self.SEP, style=wx.RA_HORIZONTAL)
+        self.Color(rb, bg, fg)
+        rb.SetToolTip(wx.ToolTip("SEPARATE_ID"))
+        rb.Select(self._.sepid)
+        self.Bind(wx.EVT_RADIOBOX, self.EvtSEP, rb)
+        grid3.Add(rb)
+
+        self.sizer.Add(grid3, flag=wx.BOTTOM, border=5)
+
+
+        self.border = wx.BoxSizer()
+        self.border.Add(self.sizer, flag=wx.ALL, border=20)
+        self.SetSizerAndFit(self.border)
+
+        self.radio1 = 0
+
+        self.SetMinSize(self.GetSize())
+
+        #self.OnTestVisual(None)
+
+        self.para_ini = True
+    def Color(self,w,bg,fg):
+        w.SetBackgroundColour(bg)
+        w.SetForegroundColour(fg)
+    def EvtSEP(self,event):
+        self._.sepid = event.GetInt()
+        if self._.vis == 1:
+            if self._.calcT9:self._.Test_Draw4()
+        #print(self._.sepid)
+    def EvtDrawMode(self, event):
+        pass
+        # print(self._.sepid)
+    def OnSLIDER(self, event):
+        name = event.EventObject.name
+        left = event.EventObject.left
+        v = self.CTRL[name].GetValue()
+        if event.EventObject.left:
+            if v > 0:
+                self.CTRL[name].SetValue(v - 1)
+        else:
+            if v < self.CTRL[name].GetMax():
+                self.CTRL[name].SetValue(v + 1)
+
+        if name == "samp_ra":
+            self.OnSampRaSlider(None)
+        if name == "samp_num":
+            self.OnSampNumSlider(None)
+    def OnSEPFULL(self, ev):
+        if self._.vis == 1:
+            self._.FULL = 1 if self._.FULL == 0 else 0
+            self._.Test_DrawAsset()
+    def OnTestOut(self,ev):
+        ut = smi.utilization()
+        if ut > 80:
+            log.Warning("<< GPU busy use rate %.3f ％ >>"%ut)
+            return
+        #self._.Test8()
+        self._.Test_CalcTasset(para_mode=0)
+        self._.Test_DrawAsset()
+    def OnTestRandom(self,ev):
+        ut = smi.utilization()
+        if ut > 80:
+            log.Warning("<< GPU busy use rate %.3f ％ >>"%ut)
+            return
+
+        if not self._.Test_CalcTasset(para_mode=1,mode ="iniJson"):
+            return
+
+        self._.Test_DrawAsset()
+
+        self.SetParameter()
+    def SetParameter(self):
+        if self.visual != None:
+            self._.OnContext()
+            self.para = self._.ssbo.G2C("np_io")
+            self.visual.OnContext()
+            self.visual.ssbo.G2C("set_io",self.para)
+            self.visual.para = self.visual.ssbo.G2C("np_io")
+            tf = np.alltrue(self.para == self.visual.para)
+            log.Log("Set parameter  validate %s "%tf)
+            if tf:
+                self._.Samp.writeJson(self.para)
+    def OnTestMax(self,ev):
+        ut = smi.utilization()
+        if ut > 80:
+            log.Warning("<< GPU busy use rate %.3f ％ >>"%ut)
+            return
+        self._.Test_CalcTasset(para_mode=1,mode ="max")
+        self._.Test_DrawAsset()
+        self.SetParameter()
+    def OnSampRaSlider(self, ev):
+        self._.samp_ra = self.CTRL["samp_ra"].GetValue()/100
+        print(" sample range  ", self._.samp_ra)
+        #self.OnTest9(None)
+    def OnSampNumSlider(self, ev):
+        self._.samp_num = self.CTRL["samp_num"].GetValue()
+        print(" sample num  ", self._.samp_num)
+        #self.OnTest9(None)
+    def GetValue(self):
+        return
 
 if __name__ == "__main__":
     from GLAux.parser import *

@@ -9,7 +9,7 @@ struct AMA{
 
 
        float close;
-       float S1[125],S2[125];
+       float S1[155],S2[155];
        float s1,s2;
        int      rid;
        int    ama;

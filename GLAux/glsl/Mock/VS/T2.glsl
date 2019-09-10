@@ -1,12 +1,15 @@
 #include <sRates.glsl>
 #include <Mock1/parameter_vf.glsl>
 #include <Visual/mock2_buffer.glsl>
+#include <util/hsl.glsl>
+
 uniform int   TYPE;
 uniform float Zoom;
 uniform vec2   res;
 uniform int   SEP;
 uniform int   FULL;
 uniform int   Eofs;
+uniform vec3  Seed;
 
 out gl_PerVertex
 {
@@ -20,7 +23,7 @@ out block
     int TYPE;
     int No;
 	vec2 uv;
-	vec3 color;
+	vec4 color;
 } O;
 
 
@@ -39,6 +42,7 @@ void main() {
 
     if(TYPE == 0 || TYPE ==1){
         O.uv        = pos * 0.5f + 0.5f;
+        O.color     = vec4(vec3(1.0),0.5);
         gl_Position = vec4(pos, 0., 1.0);
 
     }else if(TYPE == 10){
@@ -88,12 +92,12 @@ void main() {
         }
 
         if(TYPE == 15){
-            idx  = dprop[SEP].entry[Eofs + id];O.color = vec3(0.2,0.4,0.9);gl_PointSize = 15.;O.TYPE = 15;
+            idx  = dprop[SEP].entry[Eofs + id];O.color = vec4(hsl2rgb(vec3(Seed.x,0.35,0.4)),0.3);gl_PointSize = 20.;O.TYPE = 15;
             y    = _rates[idx].close;
             idx  = idx - dprop[SEP].stid;
         }
         if(TYPE == 16){
-            idx  = dprop[SEP].exit[Eofs + id];O.color = vec3(0.9,0.4,0.2);O.TYPE = 15;gl_PointSize = 15.;
+            idx  = dprop[SEP].exit[Eofs + id];O.color = vec4(hsl2rgb( vec3(Seed.y,0.35,0.4)),0.3);O.TYPE = 15;gl_PointSize = 20.;
             y    = _rates[idx].close;
             idx  = idx - dprop[SEP].stid;
         }
@@ -112,69 +116,6 @@ void main() {
          x  = float(idx)/(dprop[SEP].rx[1] - dprop[SEP].rx[0]);
          y  = (y -  dprop[SEP].ry[0])/(dprop[SEP].ry[1] - dprop[SEP].ry[0]);
 
-       /*
-        }else if(TYPE == 3 || TYPE == 4){
-
-             idx  = id + vid;
-             x  = float(idx)/(dprop[SEP].rx[1] - dprop[SEP].rx[0]);
-             if(PARATH == -1){
-                if(TYPE == 3)y  = rates[dprop[SEP].stid + idx].mu[SEP] - dprop[SEP].std;
-                if(TYPE == 4)y  = rates[dprop[SEP].stid + idx].mu[SEP] + dprop[SEP].std;
-             }else{
-                if(TYPE == 3)y  = rates[dprop[SEP].stid + idx].mu[SEP];
-                if(TYPE == 4)y  = rates[dprop[SEP].stid + idx].mu2[SEP];
-             }
-
-             if(TYPE == 3)O.color = vec3(0.2, 0.35, 0.8);
-             if(TYPE == 4)O.color = vec3(0.8, 0.65, 0.5);
-
-             y  = (y -  dprop[SEP].ry[0])/(dprop[SEP].ry[1] - dprop[SEP].ry[0]);
-
-        }else if(TYPE == 5 || TYPE == 6 || TYPE==17 || TYPE == 18){
-
-             idx  = id + vid;
-             if(TYPE == 17){idx = dprop[SEP].entry[id];O.color = vec3(0.2,0.4,0.7);gl_PointSize = 15.;O.TYPE = 15;}
-             if(TYPE == 18){idx = dprop[SEP].exit[id];O.color = vec3(0.7,0.4,0.2);O.TYPE = 15;gl_PointSize = 15.;}
-
-
-             x  = float(idx)/(dprop[SEP].rx[1] - dprop[SEP].rx[0]);
-             if(TYPE == 5 || O.TYPE == 15){y  = rates[dprop[SEP].stid + idx].mfi[SEP];if(TYPE==5)O.color = vec3(0.2,0.7,0.5);}
-             if(TYPE == 6){y  = rates[dprop[SEP].stid + idx].mfi2[SEP];O.color = vec3(0.64,0.2,0.48);}
-
-
-
-             y  = y/100.;
-
-        }else if(TYPE ==  7|| TYPE==19 || TYPE == 20){
-
-             idx  = id + vid;
-             if(TYPE == 19){idx = dprop[SEP].entry[id];O.color = vec3(0.2,0.4,0.7);gl_PointSize = 15.;O.TYPE = 15;}
-             if(TYPE == 20){idx = dprop[SEP].exit[id];O.color = vec3(0.7,0.4,0.2);O.TYPE = 15;gl_PointSize = 15.;}
-
-
-             x  = float(idx)/(dprop[SEP].rx[1] - dprop[SEP].rx[0]);
-             y  = rates[dprop[SEP].stid + idx].asset[SEP];
-             if(TYPE==7)O.color = vec3(0.2,0.7,0.5);
-             y  = (y -  dprop[SEP].ry[0])/(dprop[SEP].ry[1] - dprop[SEP].ry[0]);
-
-        }else if(TYPE ==  30){
-
-             idx  = id + vid;
-
-             x  = float(idx)/(dprop[SEP].rx[1] - dprop[SEP].rx[0]);
-             int bbr = dprop[SEP].stid;
-             if(bbr==0){
-                y  = asset[PARATH].range[asid(SEP,idx)];
-             }else if(bbr==1){
-                y  = asset[PARATH].bull[asid(SEP,idx)];
-             }else{
-                y  = asset[PARATH].bear[asid(SEP,idx)];
-             }
-             float PI =  3.14159265358979323846264;
-             O.color = vec3(0.2,0.2,0.7*abs(sin(PI*float(PARATH)/192.)));
-             y  = (y -  dprop[SEP].ry[0])/(dprop[SEP].ry[1] - dprop[SEP].ry[0]);
-        }
-        */
 
 
             vec2 pos = vec2(x,y);
@@ -204,12 +145,13 @@ void main() {
                 pos   = pos +  gl_PointSize*vec2(-1./res.x,1./res.y)/2.;
          }
          if(O.TYPE <=2){
-
-             if(SEP ==0)O.color = vec3(0.6,0.4,0.2);
-             if(SEP ==1)O.color = vec3(0.2,0.4,0.6);
-             if(SEP ==2)O.color = vec3(0.2,0.6,0.4);
-             if(SEP ==3)O.color = vec3(0.4,0.4,0.4);
-
+             float alpha = 0.6;
+             #define H(h)  (Seed.x + h)
+             #define L(l) ((l)*0.1 + 0.3)
+             if(SEP ==0)O.color = vec4(hsl2rgb(vec3(H(0) ,0.05,L(Seed.y))), alpha);
+             if(SEP ==1)O.color = vec4(hsl2rgb(vec3(H(0.1) ,0.05,L(Seed.y))), alpha);
+             if(SEP ==2)O.color = vec4(hsl2rgb(vec3(H(0.2) ,0.05,L(Seed.y))), alpha);
+             if(SEP ==3)O.color = vec4(hsl2rgb(vec3(H(0.3) ,0.05,L(Seed.y))), alpha);
          }
 
             gl_Position = vec4(pos, 0., 1.0);

@@ -1,9 +1,128 @@
 import numpy as np
+import os
 from OpenGL.GL import *
 from OpenGL.GL.shaders import *
 
 from GLAux.log import *
 from App.config import *
+import json
+
+
+class Sampler:
+    def __init__(self,seed):
+        self.seed      = seed
+        self.name      =  config["ID_json"]
+        self.num       = 0
+        self.choiceNum = -1
+        self.fix       = -1
+        self.path   = config["dir_json"]
+
+        self.para_range = param_range
+        self.vth        = len(param_range)
+        self.sep        = 4
+        np.random.seed(seed)
+    def initSeed(self):
+        np.random.seed(self.seed)
+    def randint(self,n):
+        for i, a in enumerate(self.para_range):
+            p = a[0] + a[2] * np.random.randint(0, (a[1] - a[0]) / a[2], n)
+            #print(i,"  range ",a,"  param  ",p)
+            if i == 0:
+                l = p
+            else:
+                l = np.vstack((l, p))
+        return np.vstack((l, np.zeros(n))).T
+    def roundmax(self,oarg,param,samp_ra,samp_num):
+        pid = np.random.choice(np.arange(self.vth), samp_num,replace=False)
+        mx = param[oarg[:self.sep], :8]
+        for i in range(self.sep):
+            log.Info("MaxParameter %s     result %.3f"%(mx[i].tolist(),param[oarg[i], 8]))
+
+        n  = param.shape[0]
+        N  = n//self.sep
+        for i, a in enumerate(self.para_range):
+            if i in pid:
+                if i == self.choiceNum:
+                    p  = self.choice[np.random.randint(0, len(self.choice), n)]
+                else:
+                    ra = int(samp_ra * (a[1] - a[0]) / a[2])
+                    p = []
+                    for j in range(self.sep):
+                        mu = mx[j,i] - ra / 2
+                        if mu < a[0]: mu = a[0]
+                        log.Log("sampling mu %.4f  0-%d  %d "%(mu,ra,N))
+                        p += (mu + a[2] * np.random.randint(0, ra, N)).tolist()
+            else:
+                p = []
+                for j in range(self.sep):
+                    p += (np.ones(N)*mx[j,i]).tolist()
+
+            if i == 0:
+                l = p
+            else:
+                l = np.vstack((l, p))
+
+        return np.vstack((l, np.zeros(n))).T
+    def resultplot(self,asset):
+
+        self.ax.cla()
+        def onpick3(event):
+            ind = event.ind
+            log.Info('Output : path %s  result %s'%(ind, asset[ind]))
+        col = self.ax.scatter(np.arange(len(asset)),asset,picker=True)
+        # fig.savefig('pscoll.eps')
+        self.fig.canvas.mpl_connect('pick_event', onpick3)
+
+        #plt.plot(asset)
+        # log.Log("x  %s"%asset[i, 0, 1:l].tolist())
+        # log.Log("y  %s"%asset[i, 1, 1:l].tolist())
+    def readIni(self,n):
+        fn = "%sinit.json" % (self.path)
+        if not os.path.isfile(fn):
+            log.Error("inifile Not exist!!")
+            return False
+        else:
+            with open(fn, mode='r') as f:
+                r0  = f.read()
+                r  = json.loads(r0)
+                #print(r0)
+                self.choice    = np.array(r["choice"]).astype(np.float)
+                self.choiceNum = r["choiceNum"]
+                self.fix       = r["fix"]
+
+            os.remove(fn)
+
+            for i, a in enumerate(self.para_range):
+                if i == self.choiceNum:
+                    p = self.choice[np.random.randint(0, len(self.choice), n)]
+                else:
+                    p = a[0] + a[2] * np.random.randint(0, (a[1] - a[0]) / a[2], n)
+                #print(i,"  range ",a,"  param  ",p)
+                if i == 0:
+                    l = p
+                else:
+                    l = np.vstack((l, p))
+
+            return np.vstack((l, np.zeros(n))).T
+    def writeJson(self,p):
+        Result = {
+            "Name" : "A",
+            "Prop" : {"Fix": self.fix, "Choice": self.choiceNum},
+            "ID"   : "%s-%d"%(self.name,self.num),
+            "Data" : p.tolist()
+        }
+
+        J = json.dumps(Result)
+        with open("%s%s_%d.json"%(self.path,self.name,self.num), mode='w') as f:
+            f.write(J)
+        self.num += 1
+
+#with open("tester.json", mode='r') as f:
+#    r = f.read()
+#    r  = json.loads(r)
+#    print(r)
+#    print(np.array(r["Data"]))self.path
+
 
 
 
@@ -318,5 +437,7 @@ class Ssbo:
 
 
 if __name__ == "__main__":
-    ssbo = Ssbo()
-    ssbo.dataSet()
+   #ssbo = Ssbo()
+   # ssbo.dataSet()
+    p = Sampler(12345,"name")
+    p.readIni(1000)

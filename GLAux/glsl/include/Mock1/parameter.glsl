@@ -17,7 +17,7 @@ float PAMA_BANDTH  = 0.15;
 
 
 //Const
-#define SHXTH   16
+#define SHXTH   32
 #define SHYTH   1
 #define SHZTH   1
 

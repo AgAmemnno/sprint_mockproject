@@ -9,8 +9,8 @@
 
 struct iMFI{
 
-            float   PMF[120];
-            float   NMF[120];
+            float   PMF[150];
+            float   NMF[150];
             float    Pmf,Nmf;
             float       _Pre;
             float        Mfi;
@@ -24,6 +24,7 @@ struct iMFI{
             int       signal;
 
 };
+
 void MFI_Set(inout iMFI mfi,int _roll)
 {
       mfi.roll = _roll;
@@ -71,7 +72,6 @@ float MFI_Calc(inout iMFI mfi)
 }
 
 
-
 struct MFI_Cros{
          int   Xid;
          iMFI mfi[2];
@@ -80,6 +80,7 @@ struct MFI_Cros{
          float signal;
          float status;
 };
+
 void SetMFICROS(inout MFI_Cros mfic){
 
 
@@ -94,8 +95,6 @@ void SetMFICROS(inout MFI_Cros mfic){
              mfic._Pre[0] =  mfic.mfi[0].sMfi;
              mfic._Pre[1] =  mfic.mfi[1].sMfi;
              mfic._diff   =  mfic._Pre[1] - mfic._Pre[0];
-
-
 
 }
 

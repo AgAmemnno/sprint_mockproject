@@ -34,9 +34,8 @@ void main()
 
 
      if(In.TYPE == 0){
-
-         vec3 col = vec3(0.85,0.85,0.8);
-         color = vec4(col,0.6);
+         vec3 col = vec3(0.6,0.6,0.65);
+         color = vec4(col,1.);
      }else if(In.TYPE == 1){
          color = vec4(In.color,0.6);
      }else if(In.TYPE == 10){

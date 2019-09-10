@@ -15,7 +15,7 @@ layout( std430, binding = 0 ) buffer Visual{
 
 #define  DEALTH    200
 #define  ASSETTH    300
-#define  BATCHTH   5
+#define  BATCHTH   10
 
 struct sAsset
 {
