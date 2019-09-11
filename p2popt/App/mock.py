@@ -7,6 +7,8 @@ from p2popt.GLAux.compile import *
 from p2popt.GLAux.parser import *
 from p2popt.GLAux.query import *
 from p2popt.GLAux.vao import *
+from p2popt.GLAux.log import *
+
 from p2popt.App.ssbo import *
 from p2popt.App.debug import *
 
@@ -397,7 +399,7 @@ class Mock(glcanvas.GLCanvas):
             #b1 = round(np.float32(d[i].open), 5)
             #b2 = np.uint(round( (round(self.ssbo.data[i, 2],5)  + round(self.ssbo.data[i, 3],5) + round(self.ssbo.data[i, 4],5))/ np.float32(3.),5)*100000)
             a = (a + b) % mod31
-            #log.Log("%d Th NP_DATA  GLOBAL %.7f  Shared %.7f   %s"% (i,b,b2,round(b,5) == round(b2,5)))
+            #logging.Log("%d Th NP_DATA  GLOBAL %.7f  Shared %.7f   %s"% (i,b,b2,round(b,5) == round(b2,5)))
             csum.append(round(np.float32(d[i].date),5) == round(np.float32(d[i].open),5))
 
         """
@@ -405,9 +407,9 @@ class Mock(glcanvas.GLCanvas):
             b   = d[i,0]
             a   = (a + np.uint(b * 100000)) % mod31
             b2  = np.sum(self.ssbo.data[i,2:])/np.float(3.)
-            #log.Log(" %d Th NP_DATA  %.7f  %.7f  %s" % (i,d[i, 2],self.ssbo.data[i,2],round(d[i, 2],5) == round(self.ssbo.data[i,2],5)))
-            log.Log("%d Th NP_DATA  GLOBAL %.7f  Shared %.7f   %s"% (i,b,b2,round(b,5) == round(b2,5)))
-            #log.Log("%d Th NP_DATA  GLOBAL %d  Shared %d  CPU %d     Equal %s   "%(i,int(d[i,0]*10**5),int(d[i,1]*10**5),int(b2*10**5),str(round(d[i,0],5))==str(round(d[i,1],5))==str(round(b2,5))))
+            #logging.Log(" %d Th NP_DATA  %.7f  %.7f  %s" % (i,d[i, 2],self.ssbo.data[i,2],round(d[i, 2],5) == round(self.ssbo.data[i,2],5)))
+            logging.Log("%d Th NP_DATA  GLOBAL %.7f  Shared %.7f   %s"% (i,b,b2,round(b,5) == round(b2,5)))
+            #logging.Log("%d Th NP_DATA  GLOBAL %d  Shared %d  CPU %d     Equal %s   "%(i,int(d[i,0]*10**5),int(d[i,1]*10**5),int(b2*10**5),str(round(d[i,0],5))==str(round(d[i,1],5))==str(round(b2,5))))
             csum2.append(int(d[i,0]*10**5)==int(d[i,1]*10**5)==int(b2*10**5))
             csum.append(round(d[i, 2],5) == round(self.ssbo.data[i,2],5))
             #csum.append(str(round(d[i, 0], 5)) == str(round(d[i, 1], 5)) == str(round(b2, 5)))
@@ -719,7 +721,7 @@ class Mock(glcanvas.GLCanvas):
         self.iniDraw = True
     def TestUV(self):
 
-        #log.Log("Test Draw UV")
+        #logging.Log("Test Draw UV")
 
         self.SetCurrent(self.context)
 
@@ -747,7 +749,7 @@ class Mock(glcanvas.GLCanvas):
 
         csum = []
         N = 1
-        #log.Warning("Testing BlockDesign.......\n%s"%(dictString(CONST)))
+        #logging.Warning("Testing BlockDesign.......\n%s"%(dictString(CONST)))
 
         glUniform1i(glGetUniformLocation(self.comp.PG[self.comp.name['T7']], "PID"), self.pid)
         start = time.time()
@@ -760,7 +762,7 @@ class Mock(glcanvas.GLCanvas):
             #csum.append(cs)
 
         elapsed_time = time.time() - start
-        #log.Warning("Test7 Result PID %d shared (%d) dispatch (%d , %d  , %d) %d times  Inner(%d times)  elapsed_time:%.4f[sec]" % (
+        #logging.Warning("Test7 Result PID %d shared (%d) dispatch (%d , %d  , %d) %d times  Inner(%d times)  elapsed_time:%.4f[sec]" % (
         # self.pid,self.Shid ,self.disp[0] , self.disp[1] ,self.disp[2],N,self.TOTAL,elapsed_time))
     def Test_Draw4(self):
         stid = self.stid
@@ -781,8 +783,8 @@ class Mock(glcanvas.GLCanvas):
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT)
 
         dprop = self.ssbo.G2C(tag="dprop2")
-        #log.Log("Entry Array  %s"%[dprop[0].entry[i + 1] for i in range(dprop[0].entry[0])])
-        #log.Log("Exit Array  %s" % [dprop[0].exit[i + 1] for i in range(dprop[0].exit[0])])
+        #logging.Log("Entry Array  %s"%[dprop[0].entry[i + 1] for i in range(dprop[0].entry[0])])
+        #logging.Log("Exit Array  %s" % [dprop[0].exit[i + 1] for i in range(dprop[0].exit[0])])
         entry = []
         exit  = []
 
@@ -797,7 +799,7 @@ class Mock(glcanvas.GLCanvas):
                 e = dprop[p].exit[i + 1]
                 if stid <= e and (stid + lth) > e:
                     exit[p].append(i+1)
-        #log.Log("Entry Array  %s "%entry)
+        #logging.Log("Entry Array  %s "%entry)
 
         self.pipe.bind()
         self.vao.bind()
@@ -821,7 +823,7 @@ class Mock(glcanvas.GLCanvas):
             glProgramUniform1i(*self.pipe.vloc("TYPE"), 10)
             glDrawArraysInstanced(GL_LINES, 0, 2, 2)  # self.voxsize[1]);
 
-        #log.Info("##################Draw Status  FULL %d SEPID %d  Total %d " % (self.FULL,self.sepid,self.TOTAL))
+        #logging.Info("##################Draw Status  FULL %d SEPID %d  Total %d " % (self.FULL,self.sepid,self.TOTAL))
 
         for i in range(4):
 
@@ -837,12 +839,12 @@ class Mock(glcanvas.GLCanvas):
             glDrawArraysInstanced(GL_LINES, 0, 2, int(lth - 1))
 
             if len(entry[i]) >0:
-                #log.Log("Entry Point %s "%entry[i])
+                #logging.Log("Entry Point %s "%entry[i])
                 glProgramUniform1i(*self.pipe.vloc("Eofs"), entry[i][0])
                 glProgramUniform1i(*self.pipe.vloc("TYPE"), 15)
                 glDrawArraysInstanced(GL_POINTS, 0, 1, len(entry[i]))
             if len(exit[i])  >0:
-                #log.Log("Exit Point %s " % exit[i])
+                #logging.Log("Exit Point %s " % exit[i])
                 glProgramUniform1i(*self.pipe.vloc("Eofs"), exit[i][0])
                 glProgramUniform1i(*self.pipe.vloc("TYPE"), 16)
                 glDrawArraysInstanced(GL_POINTS, 0, 1, len(exit[i]))
@@ -877,7 +879,7 @@ class Mock(glcanvas.GLCanvas):
 
         #prop = self.ssbo.G2C("dprop")
         #for i in range(4):
-        #    log.Log("PROP    min %.6f  max　%.6f "%(prop[i].ry[0],prop[i].ry[1]))
+        #    logging.Log("PROP    min %.6f  max　%.6f "%(prop[i].ry[0],prop[i].ry[1]))
 
         self.pipe.bind()
         self.vao.bind()
@@ -899,7 +901,7 @@ class Mock(glcanvas.GLCanvas):
             glProgramUniform1i(*self.pipe.vloc("TYPE"), 10)
             glDrawArraysInstanced(GL_LINES, 0, 2, 2)  # self.voxsize[1]);
 
-        #log.Info("##################Draw Status  FULL %d SEPID %d  Total %d " % (self.FULL,self.sepid,self.TOTAL))
+        #logging.Info("##################Draw Status  FULL %d SEPID %d  Total %d " % (self.FULL,self.sepid,self.TOTAL))
 
         for i in range(4):
 
@@ -985,7 +987,7 @@ class Mock(glcanvas.GLCanvas):
 
         csum = []
         N = 10
-        #log.Warning("Testing BlockDesign.......\n%s"%(dictString(CONST)))
+        #logging.Warning("Testing BlockDesign.......\n%s"%(dictString(CONST)))
 
         glUniform1i(glGetUniformLocation(self.comp.PG[self.comp.name['T8']], "PID"), self.pid)
         start = time.time()
@@ -1074,7 +1076,7 @@ class Mock(glcanvas.GLCanvas):
 
         csum = []
         N = 10
-        #log.Warning("Testing BlockDesign.......\n%s"%(dictString(CONST)))
+        #logging.Warning("Testing BlockDesign.......\n%s"%(dictString(CONST)))
 
         glUniform1i(glGetUniformLocation(self.comp.PG[self.comp.name['T9']], "PID"), self.pid)
         glUniform1i(glGetUniformLocation(self.comp.PG[self.comp.name['T9']], "VIS_MODE"), self.vis)
@@ -1171,7 +1173,7 @@ class Mock(glcanvas.GLCanvas):
 
         csum = []
         N    = self.batch
-        #log.Warning("Testing BlockDesign.......\n%s"%(dictString(CONST)))
+        #logging.Warning("Testing BlockDesign.......\n%s"%(dictString(CONST)))
 
         glUniform1i(glGetUniformLocation(self.comp.PG[self.comp.name['T10']], "PID"), -1)
         glUniform1i(glGetUniformLocation(self.comp.PG[self.comp.name['T10']], "VIS_MODE"), 0)
@@ -1293,7 +1295,7 @@ class Mock(glcanvas.GLCanvas):
 
         csum = []
         N = self.batch
-        # log.Warning("Testing BlockDesign.......\n%s"%(dictString(CONST)))
+        # logging.Warning("Testing BlockDesign.......\n%s"%(dictString(CONST)))
 
         glUniform1i(glGetUniformLocation(self.comp.PG[self.comp.name['Tasset']], "PID"), -1)
         glUniform1i(glGetUniformLocation(self.comp.PG[self.comp.name['Tasset']], "VIS_MODE"), 2)
@@ -1340,7 +1342,7 @@ class Mock(glcanvas.GLCanvas):
         dprop = self.ssbo.G2C(tag="dprop2")
         for i in range(4):
             log.Log("Entry Array  %s"%[dprop[i].ry[j] for j in range(2)])
-        #log.Log("Exit Array  %s" % [dprop[0].exit[i + 1] for i in range(dprop[0].exit[0])])
+        #logging.Log("Exit Array  %s" % [dprop[0].exit[i + 1] for i in range(dprop[0].exit[0])])
         asset = self.ssbo.G2C(tag="np_asset")
 
         self.pipe.bind()
@@ -1364,7 +1366,7 @@ class Mock(glcanvas.GLCanvas):
         if self.FULL == 0:
             glProgramUniform1i(*self.pipe.vloc("TYPE"), 10)
             glDrawArraysInstanced(GL_LINES, 0, 2, 2)  # self.voxsize[1]);
-        #log.Info("##################Draw Status  FULL %d SEPID %d  Total %d " % (self.FULL,self.sepid,self.TOTAL))
+        #logging.Info("##################Draw Status  FULL %d SEPID %d  Total %d " % (self.FULL,self.sepid,self.TOTAL))
 
 
         for i in range(4):
@@ -1503,7 +1505,7 @@ class Mock(glcanvas.GLCanvas):
 
         csum = []
         N = 1
-        #log.Warning("Testing BlockDesign.......\n%s"%(dictString(CONST)))
+        #logging.Warning("Testing BlockDesign.......\n%s"%(dictString(CONST)))
 
         glUniform1i(glGetUniformLocation(self.comp.PG[self.comp.name['TVisual']], "PID"), self.pid)
         glUniform1i(glGetUniformLocation(self.comp.PG[self.comp.name['TVisual']], "VIS_MODE"), self.vis)
@@ -2471,7 +2473,7 @@ class MockSettingVisualizer(sc.SizedDialog):
         #self._.Debug_MFI()
     def OnPidSlider(self, ev):
         self._.pid = self.CTRL["pid"].GetValue()
-            #log.Log(" Set PID   %d "%self._.pid)
+            #logging.Log(" Set PID   %d "%self._.pid)
             #self.OnTestVisual(None)
     def OnStidSlider(self, ev):
         log.Log("StidSlider %d  %d "%(self._.stid,self._.wth))

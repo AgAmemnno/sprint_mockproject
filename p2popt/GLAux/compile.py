@@ -5,7 +5,7 @@ from OpenGL.GL import *
 from OpenGL.GL.shaders import *
 
 import ctypes
-#log = logging.getLogger(__name__)
+#logging = logging.getLogger(__name__)
 __all__ = (['Pipe','Compute','read_file'])
 
 cs = """
@@ -82,10 +82,10 @@ void main(){
 }
 """
 
+
 def read_file(filename):
     with open(filename) as fp:
         return fp.readlines()
-
 
 BIT    = {
     GL_VERTEX_SHADER : GL_VERTEX_SHADER_BIT,
@@ -254,7 +254,7 @@ class Pipe(object):
             enc = sh.encode('utf-8')
             str_[0] =  ctypes.create_string_buffer(enc)
             Sh      =  glCreateShaderProgramv(type[i], 1, str_)
-            #log.Debug(fn)
+            #logging.Debug(fn)
             sh = ShaderProgram(Sh)
             sh.check_linked()
             sh.check_validate()

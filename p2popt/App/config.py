@@ -1,8 +1,9 @@
 config = {
-  "name":       "Mock(TraderVersion)",
-  "data":       "DAT_MS_GBPAUD_M1_201908.csv",
-  "dir_json" :  "Downloads",
-  "ID_json"  :  "UserID"
+  "name"     :       "Mock(TraderVersion)",
+  "dataDir"  :       "",
+  "data"     :       "DAT_MS_GBPAUD_M1_201908.csv",
+  "dir_json" :       "Downloads",
+  "ID_json"  :       "UserID"
   #"data": "../Data/GBPAUD_M1_201908.csv",
 }
 

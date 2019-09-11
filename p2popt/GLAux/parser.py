@@ -42,6 +42,8 @@ class ConstRender:
 
         OBJ = {}
         OBJ['CONST'] = const
+        import os
+        #print(self.dir,"   ",path,"   ",__file__,"  ",os.getcwd())
         tpl = self.env.get_template(path)
         shader = tpl.render(OBJ)
         path = path.replace(".tpl", ".glsl")

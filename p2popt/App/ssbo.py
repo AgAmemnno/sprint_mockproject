@@ -77,8 +77,8 @@ class Sampler:
         self.fig.canvas.mpl_connect('pick_event', onpick3)
 
         #plt.plot(asset)
-        # log.Log("x  %s"%asset[i, 0, 1:l].tolist())
-        # log.Log("y  %s"%asset[i, 1, 1:l].tolist())
+        # logging.Log("x  %s"%asset[i, 0, 1:l].tolist())
+        # logging.Log("y  %s"%asset[i, 1, 1:l].tolist())
     def readIni(self,n):
         fn = "%sinit.json" % (self.path)
         if not os.path.isfile(fn):
@@ -136,6 +136,7 @@ class Ssbo:
         """
         self.Prop    = {}
         self.Ammount = 0
+        self.dir = config["dataDir"]
     def initialize(self):
         self.Set_data()
         self.Set_AC()
@@ -150,8 +151,8 @@ class Ssbo:
             del self.Prop[i]
         log.Info("Ssbo Destroy %s"%keys)
     def load_mt(self):
-        dir = os.path.dirname(os.path.abspath(__file__))
-        path = "%s/Data/GBPAUD_M1_201908.csv"%dir
+        #dir = os.path.dirname(os.path.abspath(__file__))
+        path = "%s/GBPAUD_M1_201908.csv"%self.dir
         data = np.loadtxt(path, delimiter="\t", skiprows=1, usecols=(2, 3, 4, 5))
         return np.hstack((np.arange(len(data)).reshape(len(data), 1), data))
     def Set_data(self,name="data",bbid= 3,mt = False):
@@ -159,7 +160,8 @@ class Ssbo:
         if mt:
             data = self.load_mt()
         else:
-            data = np.loadtxt("%s/Data/%s"%(dir,config[name]),delimiter=",",skiprows=0,usecols=(1, 2, 3, 4, 5))
+            print("%s/%s"%(self.dir,config[name]))
+            data = np.loadtxt("%s/%s"%(self.dir,config[name]),delimiter=",",skiprows=0,usecols=(1, 2, 3, 4, 5))
         log.Log("DATA   min %.6f max %.6f"%(data[:,4].min(),data[:,4].max()))
         self.data  = data.astype(np.float)
         nbyte = data.data.nbytes

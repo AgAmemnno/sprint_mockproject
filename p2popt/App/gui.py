@@ -7,6 +7,8 @@ matplotlib.use('WXAgg')
 from matplotlib.widgets import Button, RadioButtons
 from matplotlib.font_manager import FontProperties
 
+
+from p2popt.GLAux.log import log
 from p2popt.App.mock import *
 
 from p2popt.App.wxasync import *
@@ -290,6 +292,17 @@ class Gui(wx.Panel):
         self.figure.set_facecolor((0.188, 0.18, 0.18))
         axcolor     = (0.175,0.18,0.18)
 
+
+        x = 0.4
+        w = 0.1
+        y = 0.82
+        h = 0.05
+
+        resetax = plt.axes([x, y, w, h])
+        self.bSet = Button(resetax, 'Settings', color=axcolor, hovercolor='0.575')
+        self.bSet.on_clicked(self.OnFile)
+
+
         x = 0.2
         w = 0.1
         y = 0.6
@@ -384,30 +397,30 @@ class Gui(wx.Panel):
 
 
         self.figure.canvas.mpl_connect('close_event', handle_close)
-    """
-        def update_sigma(val):
-            self.gp.sigma = self.sigma.val
-            print('Sigma  ', self.gp.sigma)
-            self.figure.canvas.draw_idle()
-            if not self.on: self.draw()
+    def OnFile(self,event):
+        wildcard = "CSV (*.csv)" \
+                   "All files (*.*)|*.*"
 
-        rax = plt.axes([0.025, 0.8, 0.15, 0.15], facecolor=axcolor)
-        self.sigma = Slider(rax, 'sigma', 0., 1., valinit=0.1, valstep=0.001)
-        self.sigma.on_changed(update_sigma)
-        plt.title("sigma")
+        dlg = wx.FileDialog(
+            self, message="Choose a SampleData",
+            defaultDir=os.getcwd(),
+            defaultFile="",
+            wildcard=wildcard,
+            style=wx.FD_OPEN | wx.FD_MULTIPLE |
+                  wx.FD_CHANGE_DIR | wx.FD_FILE_MUST_EXIST |
+                  wx.FD_PREVIEW
+            )
 
-        def update_beta(val):
-            self.gp.beta = self.beta.val
-            print('Beta  ', self.gp.beta)
-            self.figure.canvas.draw_idle()
-            if not self.on: self.draw()
 
-        rax = plt.axes([0.025, 0.6, 0.15, 0.15], facecolor=axcolor)
-        self.beta = Slider(rax, 'beta', 0.5, 100., valinit=25., valstep=0.1)
-        self.beta.on_changed(update_beta)
-        plt.title("beta")
+        if dlg.ShowModal() == wx.ID_OK:
+            # This returns a Python list of files that were selected.
+            paths = dlg.GetPaths()[0]
+            log.Info('You selected SampleData %s:' %paths)
+            config["dataDir"] = os.path.dirname(paths)
+            config["data"]    = os.path.basename(paths)
+            os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-    """
+        dlg.Destroy()
     def OnTest1(self, evt):
         #frame = Gui(None, -1, "Mock: ", size=(500, 500),style=wx.DEFAULT_FRAME_STYLE, name="run a sample")
         frame =  MockFrame(1,"Test1",size=(500, 500),style=wx.DEFAULT_FRAME_STYLE, name="run a sample")
@@ -493,8 +506,6 @@ class App(WxAsyncApp, wx.lib.mixins.inspection.InspectionMixin):
 
 
 if __name__ == "__main__":
-    import os
-    print(os.getcwd())
     app  = App("")
     loop = get_event_loop()
     loop.run_until_complete(app.MainLoop())

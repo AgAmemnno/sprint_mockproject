@@ -6,14 +6,16 @@ import shutil
 from functools import reduce
 
 __all__ = ['Logg','log','LoggUtil',"dictString","mul"]
-LOGDIR     = "%s/log"%os.path.dirname(os.path.abspath(__file__))
+LOGDIR     = "%s/logging"%os.path.dirname(os.path.abspath(__file__))
 LOGNAME = {"Log1": '%s\\file0.log'%LOGDIR}
 
 class LoggUtil:
+
     def Clean(dir = LOGDIR):
         if os.path.exists(dir):
             shutil.rmtree(dir)
         os.mkdir(dir)
+
 class Logg:
     LEVEL  = {"L":5,"D":10,"I":20,"W":30,"E":40,"C":50}
     colors = {'pink': '\033[95m', 'blue': '\033[94m', 'green': '\033[92m', 'yellow': '\033[93m', 'red': '\033[91m',
@@ -86,8 +88,8 @@ LoggUtil.Clean()
 log = Logg()
 log.Set("L")
 """
-log.Log("Log Color")
-log.Info("Info Color")
-log.Debug("Debug Color")
-log.Warning("Warninig Color")
+logging.Log("Log Color")
+logging.Info("Info Color")
+logging.Debug("Debug Color")
+logging.Warning("Warninig Color")
 """
