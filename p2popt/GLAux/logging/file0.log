@@ -1,0 +1,113 @@
+2019-09-11 10:01:16,704 - Log1 - INFO - You selected SampleData D:\Python\sprint_mockproject\p2popt\App\Data\DAT_MS_GBPAUD_M1_201908.csv:
+2019-09-11 10:01:19,302 - Log1 - WARNING - Please Execute Test4 !!!
+2019-09-11 10:01:19,302 - Log1 - INFO - Start Test5 Block Size Design 
+2019-09-11 10:01:19,523 - Log1 - INFO - parse ../GLAux/glsl/Mock/T5.glsl
+2019-09-11 10:01:19,523 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
+2019-09-11 10:01:19,523 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/uniform.glsl
+2019-09-11 10:01:19,539 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/parameter.glsl
+2019-09-11 10:01:19,539 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/mfi.glsl
+2019-09-11 10:01:19,539 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/ac.glsl
+2019-09-11 10:01:19,539 - Log1 - INFO - ComputeShader Generate [2]
+2019-09-11 10:01:19,681 - Log1 - Level 5 - DATA   min 1.764070 max 1.820420
+2019-09-11 10:01:19,681 - Log1 - INFO - Ssbo Generate data bbid(3) nbyte(959880) shape((23997, 5))  Ammount(959880)
+2019-09-11 10:01:19,681 - Log1 - INFO - Ssbo Generate ac bbid(1) nbyte(512) shape(128)  Ammount(960392)
+2019-09-11 10:01:19,681 - Log1 - WARNING - Testing BlockDesign.......
+SHXTH	32
+SHYTH	1
+SHZTH	1
+SHRTH	2048
+TOTAL	2048
+2019-09-11 10:01:20,243 - Log1 - WARNING - Test5 Result shared (32) dispatch (1 , 2  , 2) 10 times  Inner(2048 times)  elapsed_time:0.5622[sec]  Val 1 CheckSum [True, True, True, True, True, True, True, True, True, True]  
+2019-09-11 10:01:20,243 - Log1 - Level 5 - NP_DATA ===> last value  GPU201908027392.000000<=>CPU1.787999 
+2019-09-11 10:01:20,275 - Log1 - INFO - <<<<<<<<<<<<<Test5 Pass>>>>>>>>>>>>>>
+2019-09-11 10:01:20,354 - Log1 - INFO - ComputeShader Destroy [2]
+2019-09-11 10:01:20,354 - Log1 - INFO - Ssbo Destroy ['data', 'ac']
+2019-09-11 10:01:20,354 - Log1 - INFO - Mock Destroy <====  Test5
+2019-09-11 10:01:22,602 - Log1 - INFO - Start Test6 Block Size Design 
+2019-09-11 10:01:22,759 - Log1 - INFO - parse ../GLAux/glsl/Mock/T6.glsl
+2019-09-11 10:01:22,759 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
+2019-09-11 10:01:22,759 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/uniform.glsl
+2019-09-11 10:01:22,759 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/parameter.glsl
+2019-09-11 10:01:22,759 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/mfi.glsl
+2019-09-11 10:01:22,759 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/ama.glsl
+2019-09-11 10:01:22,759 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/ac.glsl
+2019-09-11 10:01:22,774 - Log1 - INFO - ComputeShader Generate [2]
+2019-09-11 10:01:22,918 - Log1 - Level 5 - DATA   min 1.764070 max 1.820420
+2019-09-11 10:01:22,918 - Log1 - INFO - Ssbo Generate data bbid(3) nbyte(959880) shape((23997, 5))  Ammount(959880)
+2019-09-11 10:01:22,918 - Log1 - INFO - Ssbo Generate ac bbid(1) nbyte(512) shape(128)  Ammount(960392)
+2019-09-11 10:01:22,918 - Log1 - WARNING - Testing BlockDesign.......
+SHXTH	32
+SHYTH	1
+SHZTH	1
+SHRTH	2048
+TOTAL	2048
+2019-09-11 10:01:23,786 - Log1 - WARNING - Test6 Result shared (32) dispatch (1 , 2  , 2) 10 times  Inner(2048 times)  elapsed_time:0.8686[sec]  Val 1 CheckSum [True, True, True, True, True, True, True, True, True, True]  
+2019-09-11 10:01:23,808 - Log1 - INFO - <<<<<<<<<<<<<Test6 Pass>>>>>>>>>>>>>>
+2019-09-11 10:01:23,877 - Log1 - INFO - ComputeShader Destroy [2]
+2019-09-11 10:01:23,878 - Log1 - INFO - Ssbo Destroy ['data', 'ac']
+2019-09-11 10:01:23,878 - Log1 - INFO - Mock Destroy <====  Test6
+2019-09-11 10:01:27,293 - Log1 - INFO - StartUP BlockSize 32  BatchSize 10 
+2019-09-11 10:01:29,244 - Log1 - INFO - Start Tasset Shader Dealing 
+2019-09-11 10:01:29,419 - Log1 - Level 5 - DATA   min 1.764010 max 1.832960
+2019-09-11 10:01:29,419 - Log1 - INFO - Ssbo Generate data bbid(3) nbyte(1261600) shape((31540, 5))  Ammount(1261600)
+2019-09-11 10:01:29,419 - Log1 - INFO - Ssbo Generate vis bbid(0) nbyte(5046400) shape((31540, 5, 4))  Ammount(6308000)
+2019-09-11 10:01:29,419 - Log1 - INFO - Ssbo Generate dprop bbid(2) nbyte(12992) shape((4, 406))  Ammount(6320992)
+2019-09-11 10:01:29,419 - Log1 - INFO - Ssbo Generate ac bbid(1) nbyte(512) shape(128)  Ammount(6321504)
+2019-09-11 10:01:29,435 - Log1 - INFO - Ssbo Generate asset bbid(4) nbyte(6144000) shape((1280, 2, 300))  Ammount(12465504)
+2019-09-11 10:01:29,435 - Log1 - INFO - Ssbo Generate io bbid(5) nbyte(92160) shape((1280, 9))  Ammount(12557664)
+2019-09-11 10:01:29,660 - Log1 - INFO - parse ../GLAux/glsl/Mock/Tasset.glsl
+2019-09-11 10:01:29,660 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
+2019-09-11 10:01:29,660 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/parameter.glsl
+2019-09-11 10:01:29,660 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/mfi.glsl
+2019-09-11 10:01:29,660 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/ama.glsl
+2019-09-11 10:01:29,675 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/uniform.glsl
+2019-09-11 10:01:29,675 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/ac.glsl
+2019-09-11 10:01:29,675 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/inout.glsl
+2019-09-11 10:01:29,675 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock2_buffer.glsl
+2019-09-11 10:01:29,675 - Log1 - INFO - parse ../GLAux/glsl/Mock/VS/prepro_T2.glsl
+2019-09-11 10:01:29,675 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock2_buffer.glsl
+2019-09-11 10:01:29,675 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/parameter.glsl
+2019-09-11 10:01:29,675 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
+2019-09-11 10:01:29,675 - Log1 - INFO - ComputeShader Generate [2, 4]
+2019-09-11 10:01:29,675 - Log1 - INFO - parse ../GLAux/glsl\Mock\VS\T2.glsl
+2019-09-11 10:01:29,675 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
+2019-09-11 10:01:29,691 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/parameter_vf.glsl
+2019-09-11 10:01:29,691 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock2_buffer.glsl
+2019-09-11 10:01:29,691 - Log1 - INFO - parse ../GLAux/glsl/include/util/hsl.glsl
+2019-09-11 10:01:29,691 - Log1 - INFO - parse ../GLAux/glsl\Mock\FS\T1.glsl
+2019-09-11 10:01:29,691 - Log1 - INFO - DownLoads Directory C:\\Users\kaz38/Downloads/
+2019-09-11 10:01:33,466 - Log1 - INFO - Start TestVisual Shader Dealing 
+2019-09-11 10:01:33,628 - Log1 - Level 5 - DATA   min 1.764010 max 1.832960
+2019-09-11 10:01:33,628 - Log1 - INFO - Ssbo Generate data bbid(3) nbyte(1261600) shape((31540, 5))  Ammount(1261600)
+2019-09-11 10:01:33,643 - Log1 - INFO - Ssbo Generate vis bbid(0) nbyte(5046400) shape((31540, 5, 4))  Ammount(6308000)
+2019-09-11 10:01:33,643 - Log1 - INFO - Ssbo Generate dprop bbid(2) nbyte(12992) shape((4, 406))  Ammount(6320992)
+2019-09-11 10:01:33,643 - Log1 - INFO - Ssbo Generate ac bbid(1) nbyte(512) shape(128)  Ammount(6321504)
+2019-09-11 10:01:33,643 - Log1 - INFO - Ssbo Generate io bbid(5) nbyte(92160) shape((1280, 9))  Ammount(6413664)
+2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/Mock/Tvisual.glsl
+2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
+2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/uniform.glsl
+2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/parameter.glsl
+2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/mfi.glsl
+2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/ama.glsl
+2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock1_buffer.glsl
+2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock2_prop.glsl
+2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/ac.glsl
+2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/inout.glsl
+2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/Mock/VS/prepro_T1.glsl
+2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock1_buffer.glsl
+2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock2_prop.glsl
+2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
+2019-09-11 10:01:34,245 - Log1 - INFO - ComputeShader Generate [2, 4]
+2019-09-11 10:01:34,245 - Log1 - INFO - parse ../GLAux/glsl\Mock\VS\T2.glsl
+2019-09-11 10:01:34,245 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
+2019-09-11 10:01:34,245 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/parameter_vf.glsl
+2019-09-11 10:01:34,245 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock2_buffer.glsl
+2019-09-11 10:01:34,245 - Log1 - INFO - parse ../GLAux/glsl/include/util/hsl.glsl
+2019-09-11 10:01:34,245 - Log1 - INFO - parse ../GLAux/glsl\Mock\FS\fatou.glsl
+2019-09-11 10:01:34,245 - Log1 - INFO - parse ../GLAux/glsl\Mock\VS\T2.glsl
+2019-09-11 10:01:34,245 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
+2019-09-11 10:01:34,245 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/parameter_vf.glsl
+2019-09-11 10:01:34,245 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock2_buffer.glsl
+2019-09-11 10:01:34,245 - Log1 - INFO - parse ../GLAux/glsl/include/util/hsl.glsl
+2019-09-11 10:01:34,245 - Log1 - INFO - parse ../GLAux/glsl\Mock\FS\T1.glsl
+2019-09-11 10:01:37,011 - Log1 - ERROR - inifile Not exist!!  C:\\Users\kaz38/Downloads/init.json
