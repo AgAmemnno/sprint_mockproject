@@ -78,6 +78,7 @@ class Sampler:
             with open(fn, mode='r') as f:
                 r0 = f.read()
                 r = json.loads(r0)
+                log.Log("Json Load %s    %s "%(fn,r))
                 self.choice    = np.array(r["choice"]).astype(np.float)
                 data           = np.array(r["Data"]).astype(np.float)
                 l              = len(data.flatten())

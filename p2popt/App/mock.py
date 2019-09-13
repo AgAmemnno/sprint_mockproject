@@ -9,7 +9,7 @@ from p2popt.GLAux.vao import *
 from p2popt.GLAux.log import *
 
 from p2popt.App.ssbo import *
-from p2popt.App.debug import *
+#from p2popt.App.debug import *
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -1670,6 +1670,7 @@ class Mock(glcanvas.GLCanvas):
             param = self.Samp.roundmax(oarg,param,self.samp_ra,self.samp_num)
             self.ssbo.G2C("set_io", param)
         elif mode == "json":
+            self.Samp.json_name = "Choice_1"
             param= self.param = self.Samp.roundset(self.Samp.json_name,self.ssbo.Prop["io"][3][0],self.samp_ra,self.samp_num)
             self.ssbo.G2C("set_io", self.param)
         elif mode == "out":
