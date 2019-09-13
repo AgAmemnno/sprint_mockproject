@@ -1,5 +1,4 @@
 import wx.glcanvas as glcanvas
-
 import wx.lib.sized_controls as sc
 
 from p2popt.App.wxasync import *
@@ -77,15 +76,29 @@ class Mock(glcanvas.GLCanvas):
         glcanvas.GLCanvas.__init__(self, *args, **kwargs)
         self.context  = glcanvas.GLContext(self)
         self.frame = args[0]
+        try:
+            self.name = kwargs["name"]
+        except:
+            self.name = "mock"
+        if self.name == "vis":
+            self.calcTVisual = False
+
+        log.Info("Mock Name %s  %s "%(self.name,kwargs))
+
         self.comp = None
         self.ssbo = None
-        self.pipe = None
+        self.pipe       = None
         self.pipe_fatou = None
+        self.pipe_enc   = None
         self.active = None
+        self.drag   = False
+        self.stpos    = [0,0]
         self.lastx    = self.x = 30
         self.lasty    = self.y = 30
         self.size     = None
         self.calcT8   = False
+        self.calcAPP = False
+        self.TYPE     = None
         self.redraw      = -1
         self.SetBackgroundStyle(wx.BG_STYLE_PAINT)
         self.Bind(wx.EVT_SIZE, self.OnSize)
@@ -95,11 +108,31 @@ class Mock(glcanvas.GLCanvas):
         self.Bind(wx.EVT_MOTION, self.OnMouseMotion)
         #self.Bind(wx.EVT_CLOSE, self.OnDestroy)
         self.Bind(wx.EVT_WINDOW_DESTROY, self.OnDestroy)
+        self.timer = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self.OnTimer)
+        self.Fit()
+        self.counter = 20
+
+    def On(self):
+        self.Show(True)
+        evt = wx.PyCommandEvent(wx.EVT_SIZE.typeId)
+        wx.PostEvent(self, evt)
+        wx.PostEvent(self, evt)
+    def Off(self):
+        self.Hide()
+    def OnTimer(self, event):
+        if self.render == 0:
+            self.t += self.dlt
+            self.TestEnclosure()
     def OnClose(self, event):
         print('In OnClose')
         event.Skip()
     def OnSize(self, event):
-        self.DoSetViewport()
+        if event == "On":
+            if not self.DoSetViewport(False):
+                return False
+        elif not self.DoSetViewport(True):
+            return False
         #wx.CallAfter(self.DoSetViewport)
         if self.redraw != -1:
             if self.redraw==0:
@@ -110,13 +143,24 @@ class Mock(glcanvas.GLCanvas):
                 self.Test_Draw4()
             elif self.redraw == 3:
                 self.Test_DrawAsset()
-        event.Skip()
-    def DoSetViewport(self):
+            elif self.redraw == 4:
+                self.TestEnclosure()
+            elif self.redraw == 5:
+                self.TestResult()
+            elif self.redraw == 6:
+                self.TestSampling()
+            event.Skip()
+        else:
+            self.TestUV()
+    def DoSetViewport(self,get = True):
 
-        size = self.size = self.GetClientSize()
-        #print("onsize ", size)
-        self.SetCurrent(self.context)
-        glViewport(0, 0, size.width, size.height)
+        if get: size = self.size = self.GetClientSize()
+        log.Info("%s::onsize %s "%(self.name, self.size))
+        if self.IsShown():
+            self.SetCurrent(self.context)
+            glViewport(0, 0, self.size.width, self.size.height)
+            return True
+        return False
     def Call(self,N):
         #dc = wx.PaintDC(self)
         #dc.DrawLine(0, 0, 100, 100)
@@ -134,11 +178,28 @@ class Mock(glcanvas.GLCanvas):
         #print("Mouse ",self.x,self.y)
     def OnMouseUp(self, evt):
         self.ReleaseMouse()
+        self.stpos = [2*self.x / self.size.width -1, 2*(self.size.height - self.y) / self.size.height -1]
+
+        log.Log("leftUP  %s"%(self.stpos))
     def OnMouseMotion(self, evt):
-        if evt.Dragging() and evt.LeftIsDown():
+        self.leftdown   =evt.LeftIsDown()
+        self.rightdown  =evt.RightIsDown()
+        #print(self.leftdown,self.rightdown)
+        if evt.Dragging():
             self.lastx, self.lasty = self.x, self.y
             self.x, self.y = evt.GetPosition()
-            self.Refresh(False)
+            #self.drag  = True
+            if self.redraw == 4:
+                self.TestEnclosure()
+            if self.redraw == 5:
+                self.TestResult()
+            if self.redraw == 6:
+                self.TestSampling()
+        else:
+            pass
+            #self.drag = False
+
+        self.Refresh(False)
     def OnContext(self):
         self.SetCurrent(self.context)
     def after(self):
@@ -164,6 +225,9 @@ class Mock(glcanvas.GLCanvas):
         if self.pipe_fatou != None:
             self.pipe_fatou.delete()
             self.pipe_fatou = None
+        if self.pipe_enc != None:
+            self.pipe_enc.delete()
+            self.pipe_enc = None
         #self.pipe.delete()
         #self.vao.delete()
         if self.TYPE == None:
@@ -266,7 +330,6 @@ class Mock(glcanvas.GLCanvas):
             cs = np.alltrue([disp[0] * 1024 == i for i in ac])
             log.Warning("Test1 Result  %d (atomicAdd)times  elapsed_time:%.4f[sec]  CheckSum %s  "%(self.Shid*disp[0]*disp[1]*disp[2],elapsed_time,cs))
             csum.append(cs)
-
         self.frame.Destroy()
         TO.PassT1(np.alltrue(csum))
         gc.collect()
@@ -553,7 +616,7 @@ class Mock(glcanvas.GLCanvas):
         self.comp.bind(self.comp.name['T5'])
 
         csum = []
-        N = 10
+        N = self.frame.gui.batch*15
         log.Warning("Testing BlockDesign.......\n%s"%(dictString(CONST)))
         start = time.time()
 
@@ -584,10 +647,6 @@ class Mock(glcanvas.GLCanvas):
             Y2.append(v2)
             Y.append(np.float32(d[i].date))
         log.Log("NP_DATA ===> last value  GPU%.6f<=>CPU%.6f " % (Y[-1],Y2[-1]))
-        self.frame.gui.ax1.cla()
-        self.frame.gui.ax1.plot(Y,label="GPU")
-        self.frame.gui.ax1.plot(Y2,label="CPU")
-        self.frame.gui.ax1.legend()
 
         self.frame.Destroy()
         gc.collect()
@@ -635,7 +694,7 @@ class Mock(glcanvas.GLCanvas):
         self.comp.bind(self.comp.name['T6'])
 
         csum = []
-        N = 10
+        N = self.frame.gui.batch*15
         log.Warning("Testing BlockDesign.......\n%s"%(dictString(CONST)))
         start = time.time()
 
@@ -724,8 +783,38 @@ class Mock(glcanvas.GLCanvas):
         #logging.Log("Test Draw UV")
 
         self.SetCurrent(self.context)
+        if self.pipe_fatou == None:
+            glClearColor(0, 0, 0, 1)
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+            self.after()
+            self.redraw = 0
+        else:
+            self.pipe_fatou.bind()
+            self.vao.bind()
+            glEnable(GL_BLEND)
+            glBlendFunc(GL_SRC_COLOR, GL_SRC_ALPHA)
+            glEnable(GL_VERTEX_PROGRAM_POINT_SIZE)
+            glEnable(GL_POINT_SPRITE)
 
-        self.pipe_fatou.bind()
+            glClearColor(0, 0, 0, 1)
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+            #glProgramUniform2f(*self.pipe.vloc("res"),  float(self.size.width), float(self.size.height))
+            glProgramUniform1i(*self.pipe.vloc("TYPE"), 1)
+            #glProgramUniform1f(*self.pipe.vloc("Zoom"), float(0.))
+
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
+
+            self.after()
+            self.redraw = 0
+            log.Log("Test Draw UV")
+    def TestEnclosure(self):
+
+        #logging.Log("Test Draw UV")
+        #self.timer.Start(500)
+        self.SetCurrent(self.context)
+
+        self.pipe_enc.bind()
         self.vao.bind()
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_COLOR, GL_SRC_ALPHA)
@@ -736,14 +825,84 @@ class Mock(glcanvas.GLCanvas):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
         #glProgramUniform2f(*self.pipe.vloc("res"),  float(self.size.width), float(self.size.height))
-        glProgramUniform1i(*self.pipe.vloc("TYPE"), 1)
-        #glProgramUniform1f(*self.pipe.vloc("Zoom"), float(0.))
+        glProgramUniform1i(*self.pipe_enc.vloc("TYPE"), 1)
+        glProgramUniform2f(*self.pipe_enc.floc("iResolution"), float(self.size.width), float(self.size.height))
+        glProgramUniform1f(*self.pipe_enc.floc("iTime"), float(self.t/1000))
+        glProgramUniform1f(*self.pipe_enc.floc("Radius"), float(self.stid))
+        glProgramUniform1f(*self.pipe_enc.floc("Visc"), float(self.pid))
 
+        lr = 0
+        if self.leftdown:lr  = 1
+        if self.rightdown:lr = -1
+        glProgramUniform3f(*self.pipe_enc.floc("iMouse"), float(self.x), float(self.y),lr)
+        glProgramUniform2f(*self.pipe_enc.floc("StPos"), float(self.stpos[0]), float(self.stpos[1]))
+
+        #log.Log("x %.2f y %.2f"%(self.x,self.y))
+        #log.Info("timer   %.3f"%self.t)
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
 
         self.after()
-        self.redraw = 0
-        log.Log("Test Draw UV")
+        self.redraw = 4
+        #log.Log("Test Draw Enclosure")
+    def TestResult(self):
+
+        #logging.Log("Test Draw UV")
+        #self.timer.Start(500)
+        self.SetCurrent(self.context)
+
+        self.pipe_enc.bind()
+        self.vao.bind()
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_COLOR, GL_SRC_ALPHA)
+        glEnable(GL_VERTEX_PROGRAM_POINT_SIZE)
+        glEnable(GL_POINT_SPRITE)
+        glEnable(GL_ALPHA_TEST)
+
+        glClearColor(0, 0, 0, 1)
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+        #glProgramUniform2f(*self.pipe.vloc("res"),  float(self.size.width), float(self.size.height))
+        glProgramUniform1i(*self.pipe_enc.vloc("TYPE"), 40)
+        glProgramUniform2f(*self.pipe_enc.vloc("res"), float(self.size.width), float(self.size.height))
+        glProgramUniform2f(*self.pipe_enc.vloc("ioNorm"), *(self.NormZ))
+        glProgramUniform4f(*self.pipe_enc.vloc("xNorm"), *(self.NormX+self.NormY))
+        glProgramUniform1i(*self.pipe_enc.vloc("SEP"), self.sepid)
+
+        glProgramUniform2f(*self.pipe_enc.floc("iResolution"), float(self.size.width), float(self.size.height))
+        #glProgramUniform1f(*self.pipe_enc.floc("iTime"), float(self.t / 1000))
+        glProgramUniform1f(*self.pipe_enc.floc("Radius"), float(self.stid))
+        glProgramUniform1f(*self.pipe_enc.floc("Visc"), float(self.pid))
+
+        lr = 0
+        if self.leftdown: lr = 1
+        if self.rightdown: lr = -1
+        glProgramUniform3f(*self.pipe_enc.floc("iMouse"), float(self.x), float(self.y), lr)
+        glProgramUniform2f(*self.pipe_enc.floc("StPos"), float(self.stpos[0]), float(self.stpos[1]))
+
+        # log.Log("x %.2f y %.2f"%(self.x,self.y))
+        # log.Info("timer   %.3f"%self.t)
+
+
+        glDrawArraysInstanced(GL_POINTS, 0, 1, self.PNum)
+
+
+        if self.sepid == 3:
+            glProgramUniform1i(*self.pipe_enc.vloc("TYPE"), 41)
+        else:
+            glProgramUniform1i(*self.pipe_enc.vloc("TYPE"), 1)
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
+
+
+        self.comp.bind(self.comp.name['PMB'])
+        self.ssbo.G2C("clear_io_sel",self.para)
+        glUniform1i(glGetUniformLocation(self.comp.PG[self.comp.name['PMB']], "IOTH"), len(self.para))
+        glUniform2i(glGetUniformLocation(self.comp.PG[self.comp.name['PMB']], "AX"), self.sepid*2 ,self.sepid*2+1)
+
+        glDispatchCompute(1, 16, 16)
+        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT)
+
+        self.after()
+        self.redraw = 5
     def Test_CalcT7(self):
         self.comp.bind(self.comp.name['T7'])
 
@@ -1059,9 +1218,10 @@ class Mock(glcanvas.GLCanvas):
         self.comp.name = {'T9': 0 ,"PP" : 1}
 
         vert     = "../GLAux/glsl\\Mock\\VS\\T1.glsl"
-        fatou    = "../GLAux/glsl\\Mock\\FS\\fatou.glsl"
+        enc      = "../GLAux/glsl\\Mock\\FS\\enclosure.glsl"
         frag     = "../GLAux/glsl\\Mock\\FS\\T0.glsl"
-        self.pipe_fatou = Pipe([vert, fatou], [GL_VERTEX_SHADER, GL_FRAGMENT_SHADER])
+
+        self.pipe_enc = Pipe([vert, enc], [GL_VERTEX_SHADER, GL_FRAGMENT_SHADER])
         self.pipe = Pipe([vert, frag], [GL_VERTEX_SHADER, GL_FRAGMENT_SHADER])
         self.vao =  Vao()
         self.vao.pos2d()
@@ -1069,6 +1229,95 @@ class Mock(glcanvas.GLCanvas):
 
         #self.ssbo.Set_AC(size = self.Shid*mul(disp))
         self.active = "T9"
+        self.iniDraw = True
+    def TestIO(self):
+        # Global Memory vs Shared Memory
+        if self.active == "Tasset":return
+        self.TYPE = "Tasset"
+        if self.active != None:
+            self.OnDestroy(None)
+            self.active = None
+
+        log.Info("Start IO Shader Dealing ")
+
+        self.disp  = disp = [1, 2, 2]
+        self.Shid  = 16
+        self.deal_size = 200
+        self.batch = 5
+        self.vth   = 8
+
+
+        self.SetCurrent(self.context)
+        self.ssbo = Ssbo()
+        self.ssbo.Set_data(mt = True)
+        self.ssbo.Set_Vis()
+        self.ssbo.Set_Dprop2()
+        self.ssbo.Set_AC(size=self.Shid * mul(disp))
+        self.ssbo.Set_Asset(sep = mul(disp),shid = self.Shid,batch = self.batch)
+        self.ssbo.Set_InOut(sep = mul(disp),shid = self.Shid,batch = self.batch, vth=self.vth)
+        self.ssbo.Set_Dep()
+        self.SHRTH = 2048
+        self.TOTAL = self.ssbo.Prop["data"][3][0]
+
+        cr = ConstRender()
+
+        CONST = {
+
+            "SHXTH": self.Shid,
+            "SHYTH": 1,
+            "SHZTH": 1,
+            "SHRTH": self.SHRTH,
+            "TOTAL": self.TOTAL
+
+        }
+
+        cr.render("Mock1/parameter.tpl", CONST)
+
+        CONST = {
+            "SHXTH": self.Shid,
+            "SHYTH": 1,
+            "SHZTH": 1,
+            "SHRTH": self.SHRTH,
+            "TOTAL": self.TOTAL
+        }
+
+        cr.render("Mock1/parameter_vf.tpl", CONST)
+
+        CONST = {
+            "SEPARATE"   : disp[1]*disp[2],
+            "DEALTH"  : self.deal_size,
+            "ASSETTH":  int(self.deal_size*1.5),
+            "BATCHTH" : self.batch,
+        }
+
+        cr.render("Visual/mock2_buffer.tpl", CONST)
+
+
+        CONST = {
+            "VTH"   : self.vth,
+        }
+
+        cr.render("Mock1/inout.tpl", CONST)
+
+        Tasset            = "../GLAux/glsl/Mock/Tasset.glsl"
+        prepro            = "../GLAux/glsl/Mock/VS/prepro_T2.glsl"
+        PMB               = "../GLAux/glsl/Mock/PinMB.glsl"
+        self.comp         = Compute([Tasset,prepro,PMB])
+        self.comp.name    = {'Tasset': 0 ,"PP" : 1,"PMB":2}
+
+        vert     = "../GLAux/glsl\\Mock\\VS\\T2.glsl"
+        frag     = "../GLAux/glsl\\Mock\\FS\\enclosure.glsl"
+
+        self.pipe_enc = Pipe([vert, frag], [GL_VERTEX_SHADER, GL_FRAGMENT_SHADER])
+        self.vao =  Vao()
+        self.vao.pos2d()
+
+        glAlphaFunc(GL_GREATER, 0.5)
+        self.Samp = Sampler(12345)
+
+        #self.ssbo.Set_AC(size = self.Shid*mul(disp))
+
+        gc.collect()
         self.iniDraw = True
     def Test_CalcT9(self):
 
@@ -1290,13 +1539,11 @@ class Mock(glcanvas.GLCanvas):
     def Test_CalcTasset(self,para_mode =0,mode = None):
 
         self.SetCurrent(self.context)
-
         self.comp.bind(self.comp.name['Tasset'])
 
         csum = []
-        N = self.batch
+        N    = self.batch
         # logging.Warning("Testing BlockDesign.......\n%s"%(dictString(CONST)))
-
         glUniform1i(glGetUniformLocation(self.comp.PG[self.comp.name['Tasset']], "PID"), -1)
         glUniform1i(glGetUniformLocation(self.comp.PG[self.comp.name['Tasset']], "VIS_MODE"), 2)
         glUniform1i(glGetUniformLocation(self.comp.PG[self.comp.name['Tasset']], "PARA_MODE"), para_mode)
@@ -1323,6 +1570,7 @@ class Mock(glcanvas.GLCanvas):
         log.Warning("Test asset Result shared (%d) dispatch (%d , %d  , %d) %d times  Inner(%d times)  elapsed_time:%.4f[sec]  CheckSum %s  " % (
                 self.Shid, self.disp[0], self.disp[1], self.disp[2], N, self.TOTAL, elapsed_time, csum))
         #self.Test_Input("out")
+        self.calcAPP = True
         return True
     def Test_DrawAsset(self):
 
@@ -1391,6 +1639,7 @@ class Mock(glcanvas.GLCanvas):
         """
         input  :  8
         output :  1
+        select :  1
         :return:
         """
 
@@ -1420,7 +1669,9 @@ class Mock(glcanvas.GLCanvas):
             oarg = np.argsort(o)[::-1]
             param = self.Samp.roundmax(oarg,param,self.samp_ra,self.samp_num)
             self.ssbo.G2C("set_io", param)
-
+        elif mode == "json":
+            param= self.param = self.Samp.roundset(self.Samp.json_name,self.ssbo.Prop["io"][3][0],self.samp_ra,self.samp_num)
+            self.ssbo.G2C("set_io", self.param)
         elif mode == "out":
             param = self.ssbo.G2C("np_io")
             o = param[:, 8].flatten() #.reshape(mul(self.disp),N)
@@ -1577,8 +1828,7 @@ class Mock(glcanvas.GLCanvas):
             plt.legend()
 
             plt.show()
-
-    def TestApp(self):
+    def TestApp(self,shid = 16,batch= 5):
         # Global Memory vs Shared Memory
         if self.active == "Tasset":return
         self.TYPE = "Tasset"
@@ -1586,14 +1836,13 @@ class Mock(glcanvas.GLCanvas):
             self.OnDestroy(None)
             self.active = None
 
-        log.Info("Start Tasset Shader Dealing ")
+        log.Info("Start Tasset Shader Dealing %d %d "%(shid,batch))
 
         self.disp = disp = [1, 2, 2]
-        self.Shid  = self.frame.shid
+        self.Shid  = shid
         self.deal_size = 200
-        self.batch = self.frame.batch
+        self.batch = batch
         self.vth   = 8
-
 
         self.SetCurrent(self.context)
         self.ssbo = Ssbo()
@@ -1603,6 +1852,7 @@ class Mock(glcanvas.GLCanvas):
         self.ssbo.Set_AC(size=self.Shid * mul(disp))
         self.ssbo.Set_Asset(sep = mul(disp),shid = self.Shid,batch = self.batch)
         self.ssbo.Set_InOut(sep = mul(disp),shid = self.Shid,batch = self.batch, vth=self.vth)
+        self.ssbo.Set_Dep()
 
         self.SHRTH = 2048
         self.TOTAL = self.ssbo.Prop["data"][3][0]
@@ -1646,17 +1896,28 @@ class Mock(glcanvas.GLCanvas):
 
         cr.render("Mock1/inout.tpl", CONST)
 
-        Tasset            = "../GLAux/glsl/Mock/Tasset.glsl"
-        prepro         = "../GLAux/glsl/Mock/VS/prepro_T2.glsl"
-        self.comp      = Compute([Tasset,prepro])
-        self.comp.name = {'Tasset': 0 ,"PP" : 1}
+
+        Tasset = "../GLAux/glsl/Mock/Tasset.glsl"
+        prepro = "../GLAux/glsl/Mock/VS/prepro_T2.glsl"
+        PMB = "../GLAux/glsl/Mock/PinMB.glsl"
+        self.comp = Compute([Tasset, prepro, PMB])
+        self.comp.name = {'Tasset': 0, "PP": 1, "PMB": 2}
+
 
         vert     = "../GLAux/glsl\\Mock\\VS\\T2.glsl"
         frag     = "../GLAux/glsl\\Mock\\FS\\T1.glsl"
 
         self.pipe = Pipe([vert, frag], [GL_VERTEX_SHADER, GL_FRAGMENT_SHADER])
+
+        vert = "../GLAux/glsl\\Mock\\VS\\T2.glsl"
+        frag = "../GLAux/glsl\\Mock\\FS\\enclosure.glsl"
+
+        self.pipe_enc = Pipe([vert, frag], [GL_VERTEX_SHADER, GL_FRAGMENT_SHADER])
+
         self.vao =  Vao()
         self.vao.pos2d()
+
+        glAlphaFunc(GL_GREATER, 0.5)
 
         self.Samp = Sampler(12345)
 
@@ -1726,7 +1987,63 @@ class Mock(glcanvas.GLCanvas):
         #self.ssbo.Set_AC(size = self.Shid*mul(disp))
         self.active = "TVisual"
         self.iniDraw = True
+    def TestSampling(self):
 
+        self.SetCurrent(self.context)
+
+        self.pipe_enc.bind()
+        self.vao.bind()
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_COLOR, GL_SRC_ALPHA)
+        glEnable(GL_VERTEX_PROGRAM_POINT_SIZE)
+        glEnable(GL_POINT_SPRITE)
+        glEnable(GL_ALPHA_TEST)
+
+        glClearColor(0, 0, 0, 1)
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+        #glProgramUniform2f(*self.pipe.vloc("res"),  float(self.size.width), float(self.size.height))
+        glProgramUniform1i(*self.pipe_enc.vloc("TYPE"), 40)
+        glProgramUniform2f(*self.pipe_enc.vloc("res"), float(self.size.width), float(self.size.height))
+        glProgramUniform2f(*self.pipe_enc.vloc("ioNorm"), *(self.NormZ))
+        glProgramUniform4f(*self.pipe_enc.vloc("xNorm"), *(self.NormX+self.NormY))
+        glProgramUniform1i(*self.pipe_enc.vloc("SEP"), self.plnid)
+
+        glProgramUniform2f(*self.pipe_enc.floc("iResolution"), float(self.size.width), float(self.size.height))
+        #glProgramUniform1f(*self.pipe_enc.floc("iTime"), float(self.t / 1000))
+        glProgramUniform1f(*self.pipe_enc.floc("Radius"), float(self.sampsize))
+        glProgramUniform1f(*self.pipe_enc.floc("Visc"), float(self.sampvisc))
+
+        lr = 0
+        if self.leftdown: lr = 1
+        if self.rightdown: lr = -1
+        glProgramUniform3f(*self.pipe_enc.floc("iMouse"), float(self.x), float(self.y), lr)
+        glProgramUniform2f(*self.pipe_enc.floc("StPos"), float(self.stpos[0]), float(self.stpos[1]))
+
+        # log.Log("x %.2f y %.2f"%(self.x,self.y))
+        # log.Info("timer   %.3f"%self.t)
+
+
+        glDrawArraysInstanced(GL_POINTS, 0, 1, self.PNum)
+
+
+        if self.plnid == 4:
+            glProgramUniform1i(*self.pipe_enc.vloc("TYPE"), 41)
+        else:
+            glProgramUniform1i(*self.pipe_enc.vloc("TYPE"), 1)
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
+
+
+        self.comp.bind(self.comp.name['PMB'])
+        self.ssbo.G2C("clear_io_sel",self.para)
+        glUniform1i(glGetUniformLocation(self.comp.PG[self.comp.name['PMB']], "IOTH"), len(self.para))
+        glUniform2i(glGetUniformLocation(self.comp.PG[self.comp.name['PMB']], "AX"), self.plnid*2 ,self.plnid*2+1)
+
+        glDispatchCompute(1, 16, 16)
+        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT)
+
+        self.after()
+        self.redraw = 6
 
 
 smi = Smi()
@@ -2062,7 +2379,7 @@ class MockSetting9(sc.SizedDialog):
 
         self._ = parent.mock
 
-        self._.Test9()
+        self._.TestIO()
 
         bg  = wx.Colour(23, 23, 23, alpha=200)
         fg  = wx.Colour(123, 123, 123, alpha=200)
@@ -2074,16 +2391,20 @@ class MockSetting9(sc.SizedDialog):
 
         self.CTRL = {}
 
-        grid1 = wx.FlexGridSizer(cols=3)
-        b_testuv = wx.Button(self, label="TestUV")
-        self.Color(b_testuv,bg,fg)
-        b_testuv.Bind(wx.EVT_BUTTON, self.OnTestUV, b_testuv)
+        grid1 = wx.FlexGridSizer(cols=4)
+        b_testuv = wx.Button(self, label="UVStart")
+        self.Color(b_testuv, bg, fg)
+        b_testuv.Bind(wx.EVT_BUTTON, self.OnUVStart, b_testuv)
         grid1.Add(b_testuv)
 
+        b_testuv2 = wx.Button(self, label="UVStop")
+        self.Color(b_testuv2, bg, fg)
+        b_testuv2.Bind(wx.EVT_BUTTON, self.OnUVStop, b_testuv2)
+        grid1.Add(b_testuv2)
 
         b_test9 = wx.Button(self, label="Test9")
         self.Color(b_test9, bg, fg)
-        b_test9.Bind(wx.EVT_BUTTON, self.OnTest9, b_test9)
+        b_test9.Bind(wx.EVT_BUTTON, self.OnTestRandom, b_test9)
         grid1.Add(b_test9)
 
         self.DrawMode = ["draw","overall"]
@@ -2103,9 +2424,10 @@ class MockSetting9(sc.SizedDialog):
 
         self._.pid = 0
         slider = wx.Slider(
-            self, 100, self._.pid, 0, self._.Shid, size=(250, -1),
+            self, 100, self._.pid, 0,1000, size=(250, -1),
             style=wx.SL_HORIZONTAL | wx.SL_AUTOTICKS | wx.SL_LABELS
         )
+
         self.Color(slider, bg, fg)
         slider.SetTickFreq(1)
         slider.Bind(wx.EVT_SLIDER, self.OnPidSlider)
@@ -2131,18 +2453,18 @@ class MockSetting9(sc.SizedDialog):
         grid3 = wx.FlexGridSizer(cols=5)
 
         self._.FULL = 0
-        b_sf = wx.Button(self, label="sep/full", size=(60, 40))
+        b_sf = wx.Button(self, label="Result", size=(60, 40))
         self.Color(b_sf, bg, fg)
-        b_sf.Bind(wx.EVT_BUTTON, self.OnSEPFULL)
+        b_sf.Bind(wx.EVT_BUTTON, self.OnResult)
         grid3.Add(b_sf)
         grid3.Add(size=(20, 20))
 
         self.SEP = ["0","1","2","3"]
         self._.sepid = 0
-        rb = wx.RadioBox(self, wx.ID_ANY, 'separateID',
+        rb = wx.RadioBox(self, wx.ID_ANY, 'PlaneID',
                                 choices=self.SEP, style=wx.RA_HORIZONTAL)
         self.Color(rb, bg, fg)
-        rb.SetToolTip(wx.ToolTip("SEPARATE_ID"))
+        rb.SetToolTip(wx.ToolTip("Choice 2DPlane(8C2)"))
         rb.Select(self._.sepid)
         self.Bind(wx.EVT_RADIOBOX, self.EvtSEP, rb)
         grid3.Add(rb)
@@ -2165,9 +2487,9 @@ class MockSetting9(sc.SizedDialog):
 
         grid4 = wx.FlexGridSizer(cols=3)
 
-        self._.stid = 25
+        self._.stid = 0
         slider = wx.Slider(
-            self, 100, self._.stid, 0, self._.TOTAL - int(self.WTH[-1]) , size=(250, -1),
+            self, 100, self._.stid, 0, 1000 , size=(250, -1),
             style=wx.SL_HORIZONTAL | wx.SL_AUTOTICKS | wx.SL_LABELS
         )
         self.Color(slider, bg, fg)
@@ -2208,9 +2530,12 @@ class MockSetting9(sc.SizedDialog):
         w.SetForegroundColour(fg)
     def EvtSEP(self,event):
         self._.sepid = event.GetInt()
-        if self._.vis == 1:
-            if self._.calcT9:self._.Test_Draw4()
+        self.OnResult(None)
         #print(self._.sepid)
+    def OnResult(self, ev):
+        self._.NormX = param_range[2*self._.sepid][:2]
+        self._.NormY = param_range[2 *self._.sepid+1][:2]
+        self._.TestResult()
     def EvtDrawMode(self, event):
         if event.GetInt() == 0:
             self._.vis = 1
@@ -2224,6 +2549,26 @@ class MockSetting9(sc.SizedDialog):
         self._.wth = int(self.WTH[event.GetInt()])
         if self._.vis == 1:
             if self._.calcT9:self._.Test_Draw4()
+    def OnTestRandom(self,ev):
+
+        ut = smi.utilization()
+        if ut > 80:
+            log.Warning("<< GPU busy use rate %.3f ％ >>"%ut)
+            return
+        if not self._.Test_CalcTasset(para_mode=1,mode ="iniJson"):
+            return
+
+        #self._.Test_DrawAsset()
+        self.SetParameter()
+    def SetParameter(self):
+        self._.OnContext()
+        self._.para = self._.ssbo.G2C("np_io")
+        self._.NormZ = [self._.para[:,8].min(),self._.para[:,8].max()]
+        self._.PNum  = len(self._.para)
+        log.Log("Parameters %s"%(self._.para))
+        tf = False
+        if tf:
+            self._.Samp.writeJson(self.para)
     def OnSLIDER(self, event):
         name = event.EventObject.name
         left = event.EventObject.left
@@ -2239,13 +2584,20 @@ class MockSetting9(sc.SizedDialog):
             self.OnStidSlider(None)
         elif name == "pid":
             self.OnPidSlider(None)
-    def OnTestUV(self, ev):
-        self._.TestUV()
+    def OnUVStart(self, ev):
+        self._.render = 0
+        self._.dlt = 1000/12
+        self._.t = 0
+        self._.timer.Start(self._.dlt)
         gc.collect()
-    def OnSEPFULL(self, ev):
-        if self._.vis == 1:
-            self._.FULL = 1 if self._.FULL == 0 else 0
-            if self._.calcT9:self._.Test_Draw4()
+    def OnUVStop(self, ev):
+        self._.render = -1
+        self._.timer.Stop()
+        gc.collect()
+    def OnResult(self, ev):
+        self._.NormX = param_range[2*self._.sepid][:2]
+        self._.NormY = param_range[2 *self._.sepid+1][:2]
+        self._.TestResult()
     def OnTest9(self,ev):
         ut = smi.utilization()
         if ut > 80:
@@ -2256,16 +2608,13 @@ class MockSetting9(sc.SizedDialog):
         self._.Test_Draw4()
     def OnPidSlider(self, ev):
 
-        if self._.vis == 1:
-            self._.pid = self.CTRL["pid"].GetValue()
-            #print(" vis  ", self._.vis, "  pid ", self._.pid)
-            self.OnTest9(None)
+        self._.pid = self.CTRL["pid"].GetValue()/1000
+
+        self._.TestResult()
     def OnStidSlider(self, ev):
-        if self._.vis == 1:
-            self._.stid = self.CTRL["stid"].GetValue()
-            if not self._.calcT9:
-                self._.Test_CalcT9()
-            self._.Test_Draw4()
+        #if self._.vis == 1:
+        self._.stid = self.CTRL["stid"].GetValue()/1000
+        self._.TestResult()
     def GetValue(self):
         return
 
@@ -2290,10 +2639,9 @@ class MockSettingVisualizer(sc.SizedDialog):
         self.sizer = wx.BoxSizer(wx.VERTICAL)
 
         self.CTRL = {}
-
         grid1 = wx.FlexGridSizer(cols=3)
         b_testuv = wx.Button(self, label="TestUV")
-        self.Color(b_testuv,bg,fg)
+        self.Color(b_testuv, bg, fg)
         b_testuv.Bind(wx.EVT_BUTTON, self.OnTestUV, b_testuv)
         grid1.Add(b_testuv)
 
@@ -2440,6 +2788,17 @@ class MockSettingVisualizer(sc.SizedDialog):
         self._.wth = int(self.WTH[event.GetInt()])
         #if self._.vis == 1:
         if self._.calcTVisual:self._.Test_Draw4()
+    def OnPidSlider(self, ev):
+        self._.pid = self.CTRL["pid"].GetValue()
+            #logging.Log(" Set PID   %d "%self._.pid)
+            #self.OnTestVisual(None)
+    def OnStidSlider(self, ev):
+        log.Log("StidSlider %d  %d "%(self._.stid,self._.wth))
+        #if self._.vis == 1:
+        self._.stid = self.CTRL["stid"].GetValue()
+        if not self._.calcTVisual:
+            self._.Test_CalcTVisual()
+        self._.Test_Draw4()
     def OnSLIDER(self, event):
         name = event.EventObject.name
         left = event.EventObject.left
@@ -2743,15 +3102,14 @@ class MockSettingAsset(sc.SizedDialog):
     def GetValue(self):
         return
 
+
 class MockSettingApp(sc.SizedDialog):
     def __init__(self, parent, id):
         sc.SizedDialog.__init__(self, None, -1, "Setting",
                                 style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
-
         self.gui    = parent
         self._      = parent.mock
         self.visual = parent.vis
-
 
         self._.TestApp()
 
@@ -2769,7 +3127,7 @@ class MockSettingApp(sc.SizedDialog):
 
         b_testOut = wx.Button(self, label="TestOut")
         self.Color(b_testOut, bg, fg)
-        b_testOut.Bind(wx.EVT_BUTTON, self.OnTestOut, b_testOut)
+        b_testOut.Bind(wx.EVT_BUTTON, self.OnResult, b_testOut)
         grid1.Add(b_testOut)
 
         self.sizer.Add(grid1, flag=wx.BOTTOM, border=15)
@@ -2936,37 +3294,37 @@ class MockSettingApp(sc.SizedDialog):
         if self._.vis == 1:
             self._.FULL = 1 if self._.FULL == 0 else 0
             self._.Test_DrawAsset()
-    def OnTestOut(self,ev):
-        ut = smi.utilization()
-        if ut > 80:
-            log.Warning("<< GPU busy use rate %.3f ％ >>"%ut)
-            return
-        #self._.Test8()
-        self._.Test_CalcTasset(para_mode=0)
-        self._.Test_DrawAsset()
+    def OnResult(self, ev):
+        self._.NormX = param_range[2 * self._.sepid][:2]
+        self._.NormY = param_range[2 * self._.sepid + 1][:2]
+        self._.stid  = 0.2
+        self._.pid   = 0.1
+        self._.TestResult()
     def OnTestRandom(self,ev):
         ut = smi.utilization()
         if ut > 80:
             log.Warning("<< GPU busy use rate %.3f ％ >>"%ut)
             return
-
+        self._.pid = -1
         if not self._.Test_CalcTasset(para_mode=1,mode ="iniJson"):
             return
 
         self._.Test_DrawAsset()
-
         self.SetParameter()
     def SetParameter(self):
         if self.visual != None:
             self._.OnContext()
-            self.para = self._.ssbo.G2C("np_io")
+            self._.para = self._.ssbo.G2C("np_io")
+            self._.NormZ = [self._.para[:, 8].min(), self._.para[:, 8].max()]
+            self._.PNum = len(self._.para)
+
             self.visual.OnContext()
-            self.visual.ssbo.G2C("set_io",self.para)
+            self.visual.ssbo.G2C("set_io",self._.para)
             self.visual.para = self.visual.ssbo.G2C("np_io")
-            tf = np.alltrue(self.para == self.visual.para)
+            tf = np.alltrue(self._.para == self.visual.para)
             log.Log("Set parameter  validate %s "%tf)
             if tf:
-                self._.Samp.writeJson(self.para)
+                self._.Samp.writeJson(self._.para)
     def OnTestMax(self,ev):
         ut = smi.utilization()
         if ut > 80:
@@ -2983,6 +3341,472 @@ class MockSettingApp(sc.SizedDialog):
         self._.samp_num = self.CTRL["samp_num"].GetValue()
         print(" sample num  ", self._.samp_num)
         #self.OnTest9(None)
+    def GetValue(self):
+        return
+
+class Controller(sc.SizedDialog):
+    def __init__(self, parent, id):
+        sc.SizedDialog.__init__(self, None, -1, "Setting",
+                                style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
+        self.gui    = parent
+        self._      = parent.mock
+        self.visual = parent.vis
+
+        self.on = False
+
+        self.Controller()
+
+    def OnTestRandom(self,ev):
+        ut = smi.utilization()
+        if ut > 80:
+            log.Warning("<< GPU busy use rate %.3f ％ >>"%ut)
+            return
+        self.Switch("mock")
+        self._.pid = -1
+        if not self._.Test_CalcTasset(para_mode=1,mode ="iniJson"):
+            return
+        self._.FULL = 0
+        self._.Test_DrawAsset()
+        self.SetParameter()
+        self.on = True
+    def OnTestMax(self,ev):
+        ut = smi.utilization()
+        if ut > 80:
+            log.Warning("<< GPU busy use rate %.3f ％ >>"%ut)
+            return
+        self.Switch("mock")
+        self._.Test_CalcTasset(para_mode=1,mode ="max")
+        self._.Test_DrawAsset()
+        self.SetParameter()
+        self.on = True
+    def OnTestJson(self,ev):
+        if not self.on: return
+        ut = smi.utilization()
+        if ut > 80:
+            log.Warning("<< GPU busy use rate %.3f ％ >>"%ut)
+            return
+
+        self._.Samp.json_name = "Choice_1"
+        self.Switch("mock")
+        self._.FULL = 0
+        self._.Test_CalcTasset(para_mode=1,mode ="json")
+        self._.Test_DrawAsset()
+        self.SetParameter()
+        self.on = True
+
+    def OnResult(self, ev):
+        if not self.on: return
+        self.Switch("mock")
+        self._.NormX = param_range[2 * self._.plnid][:2]
+        self._.NormY = param_range[2 * self._.plnid + 1][:2]
+        self._.TestSampling()
+    def OnSampling(self,event):
+        if not self.on: return
+        self._.Samp.writeJson(self._.ssbo.G2C("choice_io"),name = "Choice")
+
+    def SetParameter(self):
+        if self.visual != None:
+            self._.OnContext()
+            self._.para = self._.ssbo.G2C("np_io")
+            self._.NormZ = [self._.para[:, 8].min(), self._.para[:, 8].max()]
+            self._.PNum = len(self._.para)
+
+            self.visual.OnContext()
+            self.visual.ssbo.G2C("set_io",self._.para)
+            self.visual.para = self.visual.ssbo.G2C("np_io")
+            tf = np.alltrue(self._.para == self.visual.para)
+            log.Log("Set parameter  validate %s "%tf)
+            if tf:
+                self._.Samp.writeJson(self._.para)
+
+    def Controller(self):
+
+        bg = wx.Colour(23, 23, 23, alpha=200)
+        fg = wx.Colour(123, 123, 123, alpha=200)
+
+        self.SetBackgroundColour(bg)
+        self.SetForegroundColour(fg)
+
+        self.sizer = wx.BoxSizer(wx.VERTICAL)
+
+        self.CTRL = {}
+
+        grid12 = wx.FlexGridSizer(cols=1)
+
+        st = wx.StaticText(self, wx.ID_ANY, "Compute(MockClassSampling)")
+        font = wx.Font(10, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        st.SetFont(font)
+        grid12.Add(st)
+        self.sizer.Add(grid12, flag=wx.BOTTOM, border=15)
+
+        grid12 = wx.FlexGridSizer(cols=3)
+        b_testRandom = wx.Button(self, label="Random")
+        b_testRandom.SetToolTip(wx.ToolTip("Compute"))
+        self.Color(b_testRandom, bg, fg)
+        b_testRandom.Bind(wx.EVT_BUTTON, self.OnTestRandom, b_testRandom)
+        grid12.Add(b_testRandom)
+
+        b_testMax = wx.Button(self, label="Max")
+        b_testMax.SetToolTip(wx.ToolTip("Compute"))
+        self.Color(b_testMax, bg, fg)
+        b_testMax.Bind(wx.EVT_BUTTON, self.OnTestMax, b_testMax)
+        grid12.Add(b_testMax)
+
+        b_testMax = wx.Button(self, label="Json")
+        b_testMax.SetToolTip(wx.ToolTip("Compute"))
+        self.Color(b_testMax, bg, fg)
+        b_testMax.Bind(wx.EVT_BUTTON, self.OnTestJson, b_testMax)
+        grid12.Add(b_testMax)
+        self.sizer.Add(grid12, flag=wx.BOTTOM, border=5)
+
+        grid20 = wx.FlexGridSizer(cols=2)
+
+        b_testRandom = wx.Button(self, label="lines")
+        b_testRandom.SetToolTip(wx.ToolTip("Draw"))
+        self.Color(b_testRandom, bg, fg)
+        b_testRandom.Bind(wx.EVT_BUTTON, self.OnLines, b_testRandom)
+        grid20.Add(b_testRandom)
+
+        b_testRandom = wx.Button(self, label="points")
+        b_testRandom.SetToolTip(wx.ToolTip("Draw"))
+        self.Color(b_testRandom, bg, fg)
+        b_testRandom.Bind(wx.EVT_BUTTON, self.OnPoints, b_testRandom)
+        grid20.Add(b_testRandom)
+
+        self.sizer.Add(grid20, flag=wx.BOTTOM, border=15)
+
+
+
+
+        grid2 = wx.FlexGridSizer(cols=3)
+        self._.samp_ra = 0.5
+        slider = wx.Slider(
+            self, 100, self._.samp_ra, 0, 100, size=(250, -1),
+            style=wx.SL_HORIZONTAL | wx.SL_AUTOTICKS | wx.SL_LABELS
+        )
+        slider.SetToolTip(wx.ToolTip("Sampling Range"))
+        self.Color(slider, bg, fg)
+
+        slider.SetTickFreq(25)
+        slider.Bind(wx.EVT_SLIDER, self.OnSampRaSlider)
+        self.CTRL["samp_ra"] = slider
+
+        grid2.Add(slider)
+        b_sl1 = wx.Button(self, label="<", size=(20, 20))
+        self.Color(b_sl1, bg, fg)
+        b_sl1.Bind(wx.EVT_BUTTON, self.OnSLIDER)
+        b_sl1.name = "samp_ra"
+        b_sl1.left = True
+        grid2.Add(b_sl1)
+        b_sl2 = wx.Button(self, label=">", size=(20, 20))
+        self.Color(b_sl2, bg, fg)
+        b_sl2.name = "samp_ra"
+        b_sl2.left = False
+        b_sl2.Bind(wx.EVT_BUTTON, self.OnSLIDER)
+        grid2.Add(b_sl2)
+
+        self.sizer.Add(grid2, flag=wx.BOTTOM, border=5)
+
+
+
+
+        grid4 = wx.FlexGridSizer(cols=3)
+
+        self._.samp_num = self._.vth
+        slider = wx.Slider(
+            self, 100, self._.samp_num, 1, self._.vth, size=(250, -1),
+            style=wx.SL_HORIZONTAL | wx.SL_AUTOTICKS | wx.SL_LABELS
+        )
+        slider.SetToolTip(wx.ToolTip("Sampling Nums"))
+        self.Color(slider, bg, fg)
+
+
+        slider.SetTickFreq(1)
+        slider.Bind(wx.EVT_SLIDER, self.OnSampNumSlider)
+        self.CTRL["samp_num"] = slider
+
+        grid4.Add(slider)
+        b_sl1 = wx.Button(self, label="<", size=(20, 20))
+        self.Color(b_sl1, bg, fg)
+        b_sl1.Bind(wx.EVT_BUTTON, self.OnSLIDER)
+        b_sl1.name = "samp_num"
+        b_sl1.left = True
+        grid4.Add(b_sl1)
+        b_sl2 = wx.Button(self, label=">", size=(20, 20))
+        self.Color(b_sl2, bg, fg)
+        b_sl2.name = "samp_num"
+        b_sl2.left = False
+        b_sl2.Bind(wx.EVT_BUTTON, self.OnSLIDER)
+        grid4.Add(b_sl2)
+
+        self.sizer.Add(grid4, flag=wx.BOTTOM, border=5)
+
+
+        grid2 = wx.FlexGridSizer(cols=3)
+        self._.sampsize = 20/1000
+        slider = wx.Slider(
+            self, 100, 20, 0, 1000, size=(250, -1),
+            style=wx.SL_HORIZONTAL | wx.SL_AUTOTICKS | wx.SL_LABELS
+        )
+        self.Color(slider, bg, fg)
+        slider.SetTickFreq(1)
+        slider.Bind(wx.EVT_SLIDER, self.OnSampSizeSlider)
+        slider.SetToolTip(wx.ToolTip("Sampling Size"))
+        self.CTRL["sampsize"] = slider
+
+        grid2.Add(slider)
+        b_sl1 = wx.Button(self, label="<", size=(20, 20))
+        self.Color(b_sl1, bg, fg)
+        b_sl1.Bind(wx.EVT_BUTTON, self.OnSLIDER)
+        b_sl1.name = "sampsize"
+        b_sl1.left = True
+        grid2.Add(b_sl1)
+        b_sl2 = wx.Button(self, label=">", size=(20, 20))
+        self.Color(b_sl2, bg, fg)
+        b_sl2.name = "sampsize"
+        b_sl2.left = False
+        b_sl2.Bind(wx.EVT_BUTTON, self.OnSLIDER)
+        grid2.Add(b_sl2)
+
+        self.sizer.Add(grid2, flag=wx.BOTTOM, border=5)
+
+        grid2 = wx.FlexGridSizer(cols=3)
+        self._.sampvisc = 20/1000
+        slider = wx.Slider(
+            self, 100, 20, 0, 1000, size=(250, -1),
+            style=wx.SL_HORIZONTAL | wx.SL_AUTOTICKS | wx.SL_LABELS
+        )
+        slider.SetToolTip(wx.ToolTip("Sampling Viscosity"))
+        self.Color(slider, bg, fg)
+        slider.SetTickFreq(1)
+        slider.Bind(wx.EVT_SLIDER, self.OnSampViscSlider)
+        self.CTRL["sampvisc"] = slider
+        grid2.Add(slider)
+        b_sl1 = wx.Button(self, label="<", size=(20, 20))
+        self.Color(b_sl1, bg, fg)
+        b_sl1.Bind(wx.EVT_BUTTON, self.OnSLIDER)
+        b_sl1.name = "sampvisc"
+        b_sl1.left = True
+        grid2.Add(b_sl1)
+        b_sl2 = wx.Button(self, label=">", size=(20, 20))
+        self.Color(b_sl2, bg, fg)
+        b_sl2.name = "sampvisc"
+        b_sl2.left = False
+        b_sl2.Bind(wx.EVT_BUTTON, self.OnSLIDER)
+        grid2.Add(b_sl2)
+        self.sizer.Add(grid2, flag=wx.BOTTOM, border=5)
+
+
+        grid3 = wx.FlexGridSizer(cols=3)
+
+
+        self.SEP = ["0", "1", "2", "3"]
+        self._.plnid = 0
+        rb = wx.RadioBox(self, wx.ID_ANY, 'PlaneID',
+                         choices=self.SEP, style=wx.RA_HORIZONTAL)
+        self.Color(rb, bg, fg)
+        rb.SetToolTip(wx.ToolTip("Choice 2DPlane(8C2)"))
+        rb.Select(self._.plnid)
+        self.Bind(wx.EVT_RADIOBOX, self.EvtPlaneID, rb)
+        grid3.Add(rb)
+        grid3.Add(wx.Size(90,20))
+        b_sl1 = wx.Button(self, label="Sampling", size=(70, 40))
+        self.Color(b_sl1, bg, fg)
+        b_sl1.Bind(wx.EVT_BUTTON, self.OnSampling)
+        b_sl1.name = "Sampling"
+        b_sl1.left = True
+        grid3.Add(b_sl1)
+
+
+        self.sizer.Add(grid3, flag=wx.BOTTOM, border=15)
+
+        grid12 = wx.FlexGridSizer(cols=3)
+
+        st = wx.StaticText(self, wx.ID_ANY, "Visualize SamplingPath")
+        font = wx.Font(10, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        st.SetFont(font)
+        grid12.Add(st)
+        grid12.Add(wx.Size(50,20))
+        b_testRandom = wx.Button(self, label="target")
+        b_testRandom.SetToolTip(wx.ToolTip("Draw"))
+        self.Color(b_testRandom, bg, fg)
+        b_testRandom.Bind(wx.EVT_BUTTON, self.OnTarget, b_testRandom)
+        grid12.Add(b_testRandom)
+
+        self.sizer.Add(grid12, flag=wx.BOTTOM, border=15)
+
+
+        grid2 = wx.FlexGridSizer(cols=3)
+        self._.sep = 4
+        self.visual.pid = 0
+        slider = wx.Slider(
+            self, 100, self.visual.pid, 0, self._.Shid*self._.batch*self._.sep, size=(250, -1),
+            style=wx.SL_HORIZONTAL | wx.SL_AUTOTICKS | wx.SL_LABELS
+        )
+        self.pidslider = slider
+        slider.SetToolTip(wx.ToolTip("MockClass Sampling PathID"))
+        self.Color(slider, bg, fg)
+        slider.SetTickFreq(1)
+        slider.Bind(wx.EVT_SLIDER, self.OnPidSlider)
+        self.CTRL["pid"] = slider
+
+        grid2.Add(slider)
+        b_sl1 = wx.Button(self, label="<", size=(20, 20))
+        self.Color(b_sl1, bg, fg)
+        b_sl1.Bind(wx.EVT_BUTTON, self.OnSLIDER)
+        b_sl1.name = "pid"
+        b_sl1.left = True
+        grid2.Add(b_sl1)
+        b_sl2 = wx.Button(self, label=">", size=(20, 20))
+        self.Color(b_sl2, bg, fg)
+        b_sl2.name = "pid"
+        b_sl2.left = False
+        b_sl2.Bind(wx.EVT_BUTTON, self.OnSLIDER)
+        grid2.Add(b_sl2)
+
+        self.sizer.Add(grid2, flag=wx.BOTTOM, border=5)
+
+
+        grid3 = wx.FlexGridSizer(cols=1)
+
+        self.WTH = ["256", "512", "4096", "8192"]
+        self.visual.wth = 256
+        rb = wx.RadioBox(self, wx.ID_ANY, 'window',
+                         choices=self.WTH, style=wx.RA_HORIZONTAL)
+        self.Color(rb, bg, fg)
+        rb.SetToolTip(wx.ToolTip("WindowLength"))
+        rb.Select(0)
+        self.Bind(wx.EVT_RADIOBOX, self.EvtWTH, rb)
+        grid3.Add(rb)
+
+        self.sizer.Add(grid3, flag=wx.BOTTOM, border=5)
+
+        grid4 = wx.FlexGridSizer(cols=3)
+
+        self.visual.stid = 25
+        slider = wx.Slider(
+            self, 100, self.visual.stid, 0, self._.TOTAL - int(self.WTH[-1]) , size=(250, -1),
+            style=wx.SL_HORIZONTAL | wx.SL_AUTOTICKS | wx.SL_LABELS
+        )
+        slider.SetToolTip(wx.ToolTip("MockClass StartPoint"))
+        self.Color(slider, bg, fg)
+        slider.SetTickFreq(1)
+        slider.Bind(wx.EVT_SLIDER, self.OnStidSlider)
+        self.CTRL["stid"] = slider
+
+        grid4.Add(slider)
+        b_sl1 = wx.Button(self, label="<", size=(20, 20))
+        self.Color(b_sl1, bg, fg)
+        b_sl1.name = "stid"
+        b_sl1.left = True
+        b_sl1.Bind(wx.EVT_BUTTON, self.OnSLIDER)
+        grid4.Add(b_sl1)
+        b_sl2 = wx.Button(self, label=">", size=(20, 20))
+        self.Color(b_sl2, bg, fg)
+        b_sl2.Bind(wx.EVT_BUTTON, self.OnSLIDER)
+        b_sl2.name = "stid"
+        b_sl2.left = False
+        grid4.Add(b_sl2)
+
+        self.sizer.Add(grid4 , flag=wx.BOTTOM, border=5)
+
+
+        self.border = wx.BoxSizer()
+        self.border.Add(self.sizer, flag=wx.ALL, border=20)
+        self.SetSizerAndFit(self.border)
+
+
+        self.SetMinSize(self.GetSize())
+        self.para_ini = True
+
+    def Color(self,w,bg,fg):
+        w.SetBackgroundColour(bg)
+        w.SetForegroundColour(fg)
+    def EvtSEP(self,event):
+        if not self.on: return
+        self._.sepid = event.GetInt()
+        self.OnStidSlider(None)
+    def EvtWTH(self, event):
+        if not self.on: return
+        self.visual.wth = int(self.WTH[event.GetInt()])
+        self.OnStidSlider(None)
+    def EvtPlaneID(self,event):
+        if not self.on: return
+        self._.plnid = event.GetInt()
+        self.OnResult(None)
+        #print(self._.sepid)
+
+    def OnSLIDER(self, event):
+        if not self.on: return
+        name = event.EventObject.name
+        left = event.EventObject.left
+        v = self.CTRL[name].GetValue()
+        if event.EventObject.left:
+            if v > 0:
+                self.CTRL[name].SetValue(v - 1)
+        else:
+            if v < self.CTRL[name].GetMax():
+                self.CTRL[name].SetValue(v + 1)
+
+        if name == "samp_ra":
+            self.OnSampRaSlider(None)
+        if name == "samp_num":
+            self.OnSampNumSlider(None)
+        if name == "sampsize":
+            self.OnSampSizeSlider(None)
+        if name == "sampvisc":
+            self.OnSampViscSlider(None)
+    def OnSampRaSlider(self, ev):
+        if not self.on: return
+        self._.samp_ra = self.CTRL["samp_ra"].GetValue()/100
+        print(" sample range  ", self._.samp_ra)
+        self.OnResult(None)
+    def OnSampNumSlider(self, ev):
+        if not self.on: return
+        self._.samp_num = self.CTRL["samp_num"].GetValue()
+        print(" sample num  ", self._.samp_num)
+        self.OnResult(None)
+    def OnPidSlider(self, ev):
+        if not self.on: return
+        self.visual.pid = self.CTRL["pid"].GetValue()
+        self.visual.calcTVisual = False
+    def OnStidSlider(self, ev):
+        if not self.on: return
+        self.Switch("vis")
+        #log.Log("StidSlider %d  %d " % (self.visual.stid, self.visual.wth))
+        self.visual.stid = self.CTRL["stid"].GetValue()
+        if not self.visual.calcTVisual:
+            self.visual.FULL = 1
+            self.visual.sepid = 0
+            self.visual.Test_CalcTVisual()
+        self.visual.Test_Draw4()
+    def OnSampSizeSlider(self, ev):
+        if not self.on: return
+        self._.sampsize = self.CTRL["sampsize"].GetValue()/1000
+        self.OnResult(None)
+    def OnSampViscSlider(self, ev):
+        if not self.on: return
+        self._.sampvisc = self.CTRL["sampvisc"].GetValue()/1000
+        self.OnResult(None)
+
+    def Switch(self,name):
+        if self.gui.screen != name:
+            self.gui.OnSwitch(name)
+    def OnLines(self, ev):
+        if not self.on: return
+        if self._.calcAPP:
+            self.Switch("mock")
+            self._.FULL = 0
+            self._.Test_DrawAsset()
+    def OnPoints(self, ev):
+        if not self.on: return
+        if self._.calcAPP:
+            self.OnResult(None)
+    def OnTarget(self, ev):
+        if not self.on: return
+        self.Switch("vis")
+        self.OnStidSlider(None)
+
     def GetValue(self):
         return
 

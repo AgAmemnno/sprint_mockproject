@@ -2,6 +2,7 @@
 #include <Mock1/parameter_vf.glsl>
 #include <Visual/mock2_buffer.glsl>
 #include <util/hsl.glsl>
+#include <Mock1/inout.glsl>
 
 uniform int   TYPE;
 uniform float Zoom;
@@ -10,6 +11,9 @@ uniform int   SEP;
 uniform int   FULL;
 uniform int   Eofs;
 uniform vec3  Seed;
+
+uniform vec2 ioNorm;
+uniform vec4  xNorm;
 
 out gl_PerVertex
 {
@@ -35,12 +39,39 @@ void main() {
     vec2 scale = vec2(1.2,-0.05);
     vec2 sw_sc = vec2(2.,2.);
 
-
     O.scale = scale;
     O.TYPE  = TYPE;
     O.No    = 0;
 
-    if(TYPE == 0 || TYPE ==1){
+    if(TYPE == 40){
+
+        int  id  = gl_InstanceID;
+        #define NormZ(p)  (p-ioNorm.x)/(ioNorm.y-ioNorm.x)
+        #define NormX(p)  (p-xNorm.x)/(xNorm.y-xNorm.x)
+        #define NormY(p)  (p-xNorm.z)/(xNorm.w-xNorm.z)
+
+        #define Max  35.
+	    gl_PointSize  =  Max*NormZ(io[id].y);
+
+	    int               idx;
+        float              x,y;
+     //174  float x;
+        x    =  NormX(io[id].x[SEP*2]);
+        y    =  NormY(io[id].x[SEP*2+1]);
+
+        vec2 pos = vec2(x,y);
+
+        //pos.y = (pos.y - scale.y)/scale.x;
+        pos   = 2.*pos - 1.;
+
+        pos   = pos +  gl_PointSize*vec2(-1./res.x,1./res.y)/2.;
+
+        O.color = (io[id].sel ==1)?vec4(0.3,0.3,0.3,1.):vec4(1);
+
+        gl_Position = vec4(pos, 0., 1.0);
+
+    }
+    else if(TYPE == 0 || TYPE ==1 || TYPE == 41){
         O.uv        = pos * 0.5f + 0.5f;
         O.color     = vec4(vec3(1.0),0.5);
         gl_Position = vec4(pos, 0., 1.0);

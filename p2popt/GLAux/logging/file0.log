@@ -1,113 +1,230 @@
-2019-09-11 10:01:16,704 - Log1 - INFO - You selected SampleData D:\Python\sprint_mockproject\p2popt\App\Data\DAT_MS_GBPAUD_M1_201908.csv:
-2019-09-11 10:01:19,302 - Log1 - WARNING - Please Execute Test4 !!!
-2019-09-11 10:01:19,302 - Log1 - INFO - Start Test5 Block Size Design 
-2019-09-11 10:01:19,523 - Log1 - INFO - parse ../GLAux/glsl/Mock/T5.glsl
-2019-09-11 10:01:19,523 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
-2019-09-11 10:01:19,523 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/uniform.glsl
-2019-09-11 10:01:19,539 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/parameter.glsl
-2019-09-11 10:01:19,539 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/mfi.glsl
-2019-09-11 10:01:19,539 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/ac.glsl
-2019-09-11 10:01:19,539 - Log1 - INFO - ComputeShader Generate [2]
-2019-09-11 10:01:19,681 - Log1 - Level 5 - DATA   min 1.764070 max 1.820420
-2019-09-11 10:01:19,681 - Log1 - INFO - Ssbo Generate data bbid(3) nbyte(959880) shape((23997, 5))  Ammount(959880)
-2019-09-11 10:01:19,681 - Log1 - INFO - Ssbo Generate ac bbid(1) nbyte(512) shape(128)  Ammount(960392)
-2019-09-11 10:01:19,681 - Log1 - WARNING - Testing BlockDesign.......
-SHXTH	32
-SHYTH	1
-SHZTH	1
-SHRTH	2048
-TOTAL	2048
-2019-09-11 10:01:20,243 - Log1 - WARNING - Test5 Result shared (32) dispatch (1 , 2  , 2) 10 times  Inner(2048 times)  elapsed_time:0.5622[sec]  Val 1 CheckSum [True, True, True, True, True, True, True, True, True, True]  
-2019-09-11 10:01:20,243 - Log1 - Level 5 - NP_DATA ===> last value  GPU201908027392.000000<=>CPU1.787999 
-2019-09-11 10:01:20,275 - Log1 - INFO - <<<<<<<<<<<<<Test5 Pass>>>>>>>>>>>>>>
-2019-09-11 10:01:20,354 - Log1 - INFO - ComputeShader Destroy [2]
-2019-09-11 10:01:20,354 - Log1 - INFO - Ssbo Destroy ['data', 'ac']
-2019-09-11 10:01:20,354 - Log1 - INFO - Mock Destroy <====  Test5
-2019-09-11 10:01:22,602 - Log1 - INFO - Start Test6 Block Size Design 
-2019-09-11 10:01:22,759 - Log1 - INFO - parse ../GLAux/glsl/Mock/T6.glsl
-2019-09-11 10:01:22,759 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
-2019-09-11 10:01:22,759 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/uniform.glsl
-2019-09-11 10:01:22,759 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/parameter.glsl
-2019-09-11 10:01:22,759 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/mfi.glsl
-2019-09-11 10:01:22,759 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/ama.glsl
-2019-09-11 10:01:22,759 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/ac.glsl
-2019-09-11 10:01:22,774 - Log1 - INFO - ComputeShader Generate [2]
-2019-09-11 10:01:22,918 - Log1 - Level 5 - DATA   min 1.764070 max 1.820420
-2019-09-11 10:01:22,918 - Log1 - INFO - Ssbo Generate data bbid(3) nbyte(959880) shape((23997, 5))  Ammount(959880)
-2019-09-11 10:01:22,918 - Log1 - INFO - Ssbo Generate ac bbid(1) nbyte(512) shape(128)  Ammount(960392)
-2019-09-11 10:01:22,918 - Log1 - WARNING - Testing BlockDesign.......
-SHXTH	32
-SHYTH	1
-SHZTH	1
-SHRTH	2048
-TOTAL	2048
-2019-09-11 10:01:23,786 - Log1 - WARNING - Test6 Result shared (32) dispatch (1 , 2  , 2) 10 times  Inner(2048 times)  elapsed_time:0.8686[sec]  Val 1 CheckSum [True, True, True, True, True, True, True, True, True, True]  
-2019-09-11 10:01:23,808 - Log1 - INFO - <<<<<<<<<<<<<Test6 Pass>>>>>>>>>>>>>>
-2019-09-11 10:01:23,877 - Log1 - INFO - ComputeShader Destroy [2]
-2019-09-11 10:01:23,878 - Log1 - INFO - Ssbo Destroy ['data', 'ac']
-2019-09-11 10:01:23,878 - Log1 - INFO - Mock Destroy <====  Test6
-2019-09-11 10:01:27,293 - Log1 - INFO - StartUP BlockSize 32  BatchSize 10 
-2019-09-11 10:01:29,244 - Log1 - INFO - Start Tasset Shader Dealing 
-2019-09-11 10:01:29,419 - Log1 - Level 5 - DATA   min 1.764010 max 1.832960
-2019-09-11 10:01:29,419 - Log1 - INFO - Ssbo Generate data bbid(3) nbyte(1261600) shape((31540, 5))  Ammount(1261600)
-2019-09-11 10:01:29,419 - Log1 - INFO - Ssbo Generate vis bbid(0) nbyte(5046400) shape((31540, 5, 4))  Ammount(6308000)
-2019-09-11 10:01:29,419 - Log1 - INFO - Ssbo Generate dprop bbid(2) nbyte(12992) shape((4, 406))  Ammount(6320992)
-2019-09-11 10:01:29,419 - Log1 - INFO - Ssbo Generate ac bbid(1) nbyte(512) shape(128)  Ammount(6321504)
-2019-09-11 10:01:29,435 - Log1 - INFO - Ssbo Generate asset bbid(4) nbyte(6144000) shape((1280, 2, 300))  Ammount(12465504)
-2019-09-11 10:01:29,435 - Log1 - INFO - Ssbo Generate io bbid(5) nbyte(92160) shape((1280, 9))  Ammount(12557664)
-2019-09-11 10:01:29,660 - Log1 - INFO - parse ../GLAux/glsl/Mock/Tasset.glsl
-2019-09-11 10:01:29,660 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
-2019-09-11 10:01:29,660 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/parameter.glsl
-2019-09-11 10:01:29,660 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/mfi.glsl
-2019-09-11 10:01:29,660 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/ama.glsl
-2019-09-11 10:01:29,675 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/uniform.glsl
-2019-09-11 10:01:29,675 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/ac.glsl
-2019-09-11 10:01:29,675 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/inout.glsl
-2019-09-11 10:01:29,675 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock2_buffer.glsl
-2019-09-11 10:01:29,675 - Log1 - INFO - parse ../GLAux/glsl/Mock/VS/prepro_T2.glsl
-2019-09-11 10:01:29,675 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock2_buffer.glsl
-2019-09-11 10:01:29,675 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/parameter.glsl
-2019-09-11 10:01:29,675 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
-2019-09-11 10:01:29,675 - Log1 - INFO - ComputeShader Generate [2, 4]
-2019-09-11 10:01:29,675 - Log1 - INFO - parse ../GLAux/glsl\Mock\VS\T2.glsl
-2019-09-11 10:01:29,675 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
-2019-09-11 10:01:29,691 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/parameter_vf.glsl
-2019-09-11 10:01:29,691 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock2_buffer.glsl
-2019-09-11 10:01:29,691 - Log1 - INFO - parse ../GLAux/glsl/include/util/hsl.glsl
-2019-09-11 10:01:29,691 - Log1 - INFO - parse ../GLAux/glsl\Mock\FS\T1.glsl
-2019-09-11 10:01:29,691 - Log1 - INFO - DownLoads Directory C:\\Users\kaz38/Downloads/
-2019-09-11 10:01:33,466 - Log1 - INFO - Start TestVisual Shader Dealing 
-2019-09-11 10:01:33,628 - Log1 - Level 5 - DATA   min 1.764010 max 1.832960
-2019-09-11 10:01:33,628 - Log1 - INFO - Ssbo Generate data bbid(3) nbyte(1261600) shape((31540, 5))  Ammount(1261600)
-2019-09-11 10:01:33,643 - Log1 - INFO - Ssbo Generate vis bbid(0) nbyte(5046400) shape((31540, 5, 4))  Ammount(6308000)
-2019-09-11 10:01:33,643 - Log1 - INFO - Ssbo Generate dprop bbid(2) nbyte(12992) shape((4, 406))  Ammount(6320992)
-2019-09-11 10:01:33,643 - Log1 - INFO - Ssbo Generate ac bbid(1) nbyte(512) shape(128)  Ammount(6321504)
-2019-09-11 10:01:33,643 - Log1 - INFO - Ssbo Generate io bbid(5) nbyte(92160) shape((1280, 9))  Ammount(6413664)
-2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/Mock/Tvisual.glsl
-2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
-2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/uniform.glsl
-2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/parameter.glsl
-2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/mfi.glsl
-2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/ama.glsl
-2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock1_buffer.glsl
-2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock2_prop.glsl
-2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/ac.glsl
-2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/inout.glsl
-2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/Mock/VS/prepro_T1.glsl
-2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock1_buffer.glsl
-2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock2_prop.glsl
-2019-09-11 10:01:34,230 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
-2019-09-11 10:01:34,245 - Log1 - INFO - ComputeShader Generate [2, 4]
-2019-09-11 10:01:34,245 - Log1 - INFO - parse ../GLAux/glsl\Mock\VS\T2.glsl
-2019-09-11 10:01:34,245 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
-2019-09-11 10:01:34,245 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/parameter_vf.glsl
-2019-09-11 10:01:34,245 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock2_buffer.glsl
-2019-09-11 10:01:34,245 - Log1 - INFO - parse ../GLAux/glsl/include/util/hsl.glsl
-2019-09-11 10:01:34,245 - Log1 - INFO - parse ../GLAux/glsl\Mock\FS\fatou.glsl
-2019-09-11 10:01:34,245 - Log1 - INFO - parse ../GLAux/glsl\Mock\VS\T2.glsl
-2019-09-11 10:01:34,245 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
-2019-09-11 10:01:34,245 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/parameter_vf.glsl
-2019-09-11 10:01:34,245 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock2_buffer.glsl
-2019-09-11 10:01:34,245 - Log1 - INFO - parse ../GLAux/glsl/include/util/hsl.glsl
-2019-09-11 10:01:34,245 - Log1 - INFO - parse ../GLAux/glsl\Mock\FS\T1.glsl
-2019-09-11 10:01:37,011 - Log1 - ERROR - inifile Not exist!!  C:\\Users\kaz38/Downloads/init.json
+2019-09-13 10:11:09,960 - Log1 - INFO - Mock Name mock  {'size': (2000, 1000), 'name': 'mock'} 
+2019-09-13 10:11:09,976 - Log1 - INFO - Mock Name vis  {'size': (2000, 1000), 'name': 'vis'} 
+2019-09-13 10:11:09,976 - Log1 - INFO - mock::onsize (784, 318) 
+2019-09-13 10:11:10,257 - Log1 - INFO - mock::onsize (784, 318) 
+2019-09-13 10:11:10,288 - Log1 - INFO - mock::onsize (784, 318) 
+2019-09-13 10:11:12,523 - Log1 - INFO - Start TestVisual Shader Dealing 
+2019-09-13 10:11:12,726 - Log1 - Level 5 - DATA   min 1.764010 max 1.832960
+2019-09-13 10:11:12,742 - Log1 - INFO - Ssbo Generate data bbid(3) nbyte(1261600) shape((31540, 5))  Ammount(1261600)
+2019-09-13 10:11:12,742 - Log1 - INFO - Ssbo Generate vis bbid(0) nbyte(5046400) shape((31540, 5, 4))  Ammount(6308000)
+2019-09-13 10:11:12,742 - Log1 - INFO - Ssbo Generate dprop bbid(2) nbyte(12992) shape((4, 406))  Ammount(6320992)
+2019-09-13 10:11:12,742 - Log1 - INFO - Ssbo Generate ac bbid(1) nbyte(256) shape(64)  Ammount(6321248)
+2019-09-13 10:11:12,742 - Log1 - INFO - Ssbo Generate io bbid(5) nbyte(51200) shape((640, 10))  Ammount(6372448)
+2019-09-13 10:11:13,258 - Log1 - INFO - parse ../GLAux/glsl/Mock/Tvisual.glsl
+2019-09-13 10:11:13,258 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
+2019-09-13 10:11:13,258 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/uniform.glsl
+2019-09-13 10:11:13,258 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/parameter.glsl
+2019-09-13 10:11:13,258 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/mfi.glsl
+2019-09-13 10:11:13,258 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/ama.glsl
+2019-09-13 10:11:13,258 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock1_buffer.glsl
+2019-09-13 10:11:13,258 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock2_prop.glsl
+2019-09-13 10:11:13,258 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/ac.glsl
+2019-09-13 10:11:13,258 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/inout.glsl
+2019-09-13 10:11:13,273 - Log1 - INFO - parse ../GLAux/glsl/Mock/VS/prepro_T1.glsl
+2019-09-13 10:11:13,273 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock1_buffer.glsl
+2019-09-13 10:11:13,273 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock2_prop.glsl
+2019-09-13 10:11:13,273 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
+2019-09-13 10:11:13,273 - Log1 - INFO - ComputeShader Generate [2, 4]
+2019-09-13 10:11:13,273 - Log1 - INFO - parse ../GLAux/glsl\Mock\VS\T2.glsl
+2019-09-13 10:11:13,273 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
+2019-09-13 10:11:13,273 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/parameter_vf.glsl
+2019-09-13 10:11:13,273 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock2_buffer.glsl
+2019-09-13 10:11:13,273 - Log1 - INFO - parse ../GLAux/glsl/include/util/hsl.glsl
+2019-09-13 10:11:13,273 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/inout.glsl
+2019-09-13 10:11:13,273 - Log1 - INFO - parse ../GLAux/glsl\Mock\FS\fatou.glsl
+2019-09-13 10:11:13,273 - Log1 - INFO - parse ../GLAux/glsl\Mock\VS\T2.glsl
+2019-09-13 10:11:13,273 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
+2019-09-13 10:11:13,273 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/parameter_vf.glsl
+2019-09-13 10:11:13,273 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock2_buffer.glsl
+2019-09-13 10:11:13,273 - Log1 - INFO - parse ../GLAux/glsl/include/util/hsl.glsl
+2019-09-13 10:11:13,273 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/inout.glsl
+2019-09-13 10:11:13,273 - Log1 - INFO - parse ../GLAux/glsl\Mock\FS\T1.glsl
+2019-09-13 10:11:13,289 - Log1 - INFO - Start Tasset Shader Dealing 16 10 
+2019-09-13 10:11:13,461 - Log1 - Level 5 - DATA   min 1.764010 max 1.832960
+2019-09-13 10:11:13,461 - Log1 - INFO - Ssbo Generate data bbid(3) nbyte(1261600) shape((31540, 5))  Ammount(1261600)
+2019-09-13 10:11:13,461 - Log1 - INFO - Ssbo Generate vis bbid(0) nbyte(5046400) shape((31540, 5, 4))  Ammount(6308000)
+2019-09-13 10:11:13,461 - Log1 - INFO - Ssbo Generate dprop bbid(2) nbyte(12992) shape((4, 406))  Ammount(6320992)
+2019-09-13 10:11:13,461 - Log1 - INFO - Ssbo Generate ac bbid(1) nbyte(256) shape(64)  Ammount(6321248)
+2019-09-13 10:11:13,477 - Log1 - INFO - Ssbo Generate asset bbid(4) nbyte(3072000) shape((640, 2, 300))  Ammount(9393248)
+2019-09-13 10:11:13,477 - Log1 - INFO - Ssbo Generate io bbid(5) nbyte(51200) shape((640, 10))  Ammount(9444448)
+2019-09-13 10:11:13,477 - Log1 - INFO - Ssbo Generate dep bbid(6) nbyte(1048576) shape([512, 512])  Ammount(10493024)
+2019-09-13 10:11:13,602 - Log1 - INFO - parse ../GLAux/glsl/Mock/Tasset.glsl
+2019-09-13 10:11:13,602 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
+2019-09-13 10:11:13,602 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/parameter.glsl
+2019-09-13 10:11:13,602 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/mfi.glsl
+2019-09-13 10:11:13,602 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/ama.glsl
+2019-09-13 10:11:13,602 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/uniform.glsl
+2019-09-13 10:11:13,602 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/ac.glsl
+2019-09-13 10:11:13,602 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/inout.glsl
+2019-09-13 10:11:13,602 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock2_buffer.glsl
+2019-09-13 10:11:13,617 - Log1 - INFO - parse ../GLAux/glsl/Mock/VS/prepro_T2.glsl
+2019-09-13 10:11:13,617 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock2_buffer.glsl
+2019-09-13 10:11:13,617 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/parameter.glsl
+2019-09-13 10:11:13,617 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
+2019-09-13 10:11:13,617 - Log1 - INFO - parse ../GLAux/glsl/Mock/PinMB.glsl
+2019-09-13 10:11:13,617 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/Depth.glsl
+2019-09-13 10:11:13,617 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/inout.glsl
+2019-09-13 10:11:13,617 - Log1 - INFO - ComputeShader Generate [2, 4, 6]
+2019-09-13 10:11:13,617 - Log1 - INFO - parse ../GLAux/glsl\Mock\VS\T2.glsl
+2019-09-13 10:11:13,617 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
+2019-09-13 10:11:13,617 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/parameter_vf.glsl
+2019-09-13 10:11:13,617 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock2_buffer.glsl
+2019-09-13 10:11:13,617 - Log1 - INFO - parse ../GLAux/glsl/include/util/hsl.glsl
+2019-09-13 10:11:13,617 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/inout.glsl
+2019-09-13 10:11:13,617 - Log1 - INFO - parse ../GLAux/glsl\Mock\FS\T1.glsl
+2019-09-13 10:11:13,617 - Log1 - INFO - parse ../GLAux/glsl\Mock\VS\T2.glsl
+2019-09-13 10:11:13,617 - Log1 - INFO - parse ../GLAux/glsl/include/sRates.glsl
+2019-09-13 10:11:13,617 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/parameter_vf.glsl
+2019-09-13 10:11:13,617 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/mock2_buffer.glsl
+2019-09-13 10:11:13,633 - Log1 - INFO - parse ../GLAux/glsl/include/util/hsl.glsl
+2019-09-13 10:11:13,633 - Log1 - INFO - parse ../GLAux/glsl/include/Mock1/inout.glsl
+2019-09-13 10:11:13,633 - Log1 - INFO - parse ../GLAux/glsl\Mock\FS\enclosure.glsl
+2019-09-13 10:11:13,633 - Log1 - INFO - parse ../GLAux/glsl/include/Visual/Depth.glsl
+2019-09-13 10:11:13,633 - Log1 - INFO - DownLoads Directory C:\\Users\kaz38/Downloads/
+2019-09-13 10:11:16,649 - Log1 - INFO - Ssbo Set io io bbid(5)  shape((640, 10))  data_shape((640, 10))
+2019-09-13 10:11:16,649 - Log1 - WARNING - 0 th  output 0.000 input [3.90e+01 7.00e+01 3.14e+01 7.20e+01 9.20e+01 4.40e+01 9.00e-03 1.50e-01]
+2019-09-13 10:11:16,649 - Log1 - WARNING - 639 th  output 0.000 input [2.90e+01 6.50e+01 3.74e+01 1.60e+01 1.16e+02 2.01e+02 8.00e-03 3.50e-01]
+2019-09-13 10:11:17,868 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 0  result [2320228150 3997310660 3066968371 2785462363 2421723066 2760436840
+  574881111 3419517586 1407865652 3140967581 3989908861 3727836054
+  374152784 3756754115 1570192947 2208819916]  
+2019-09-13 10:11:17,868 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 1  result [2380792552  604023340  160696454 2265686508 3006777415  250616702
+ 3449963508 3442191677 3635367111 1940103968 4255484722 1011783452
+    7201183  587040170 4037408653 3851595154]  
+2019-09-13 10:11:17,868 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 2  result [3214366260 3674921593 2248018138 2339287905   96138367 1015941450
+ 2557036134 2096820026  747297832 1661682872 1350060794 1716226624
+  637432842  787075792  313365216  945011357]  
+2019-09-13 10:11:17,868 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 3  result [2917250143 2093876180   62159110 4260526282  529760942 3377824148
+  840193173 3014532351   85904821 1732617000 3369159543 3078046484
+ 1020235027 3230204794 1725038360 2673652666]  
+2019-09-13 10:11:18,770 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 0  result [3734428987  464810402  415971108  700308605 1829816955  429613077
+ 3779854929 2635814538 4100251425  317435511 1997570743 4071713365
+ 3938307185 1105897456 3408354279 1177058485]  
+2019-09-13 10:11:18,770 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 1  result [3783405245  856135308 2223752613  418321320 3170367689 3353328487
+ 1579820509 3456615251 2924611307 1139969850 2021012118 3330574928
+ 2642647208 3655102093 2370806738  473406701]  
+2019-09-13 10:11:18,770 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 2  result [1508487080 1667514654  606275430 2373506963 1269240549 1953995615
+ 3566660126 3921164156 1800970146  905253079 2595519079 2628382391
+  649350027 2615308145  938445176 1596612852]  
+2019-09-13 10:11:18,770 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 3  result [1873705217  951189364 1364187929 1666232446 3213150638  222268013
+  739261104 4079097448 1806645218 2937862070  901216397 3057231905
+ 2070195043 3597602600  996559401  424538869]  
+2019-09-13 10:11:19,672 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 0  result [4208688224 2940190177 3170775842 3351578813  222603623  460646466
+ 2112783015  324843012 3282056648  616921508  579720046 1949969797
+ 1034107900 2798549938 3624522702 3023143978]  
+2019-09-13 10:11:19,672 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 1  result [ 293138605  622795024  386180530 3777074277 2411453110 1886346490
+ 2647452561 2426203456 2654062099 1410258225 4108251973  924443264
+ 1395639733 2160322823 1093758170 2495301165]  
+2019-09-13 10:11:19,672 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 2  result [1460025334 1668971875 3122004838 1920224447  837413266 2542891869
+ 2159349056  450863626 2953999780   18259262 4013871964 2568689093
+  367216444 2662883615 3858159773  910736558]  
+2019-09-13 10:11:19,672 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 3  result [2686086578 3166289091 2174315531 2456259390 2156595384  752175626
+ 1419389582 2326931709 4270401110  952123551 3097403525 3157113020
+  384630687 3990413754 3982456073 2115997039]  
+2019-09-13 10:11:20,578 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 0  result [1655575227  193923345 1835552726  180905001 2328630995 1536907984
+ 3493588166 1662332843 1113098872 3780558892 1633543446  498012541
+ 3581434583 2152328502 1939051583 2678539753]  
+2019-09-13 10:11:20,578 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 1  result [1031072706 1517625226 2504925968 1059896122 1229988019  316478061
+ 4188024483 1813214583 2962223664 2395339556 2430422691 2897833134
+  824127476 2728110768  526125870  596195108]  
+2019-09-13 10:11:20,578 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 2  result [2141149084 3994952487 1293369900 3283506054 1751346603 2753099659
+ 1638489745 1104625578  991916375 1930252318 4198914935 3957357891
+ 3592359623 4060184912 1636291620 2562089356]  
+2019-09-13 10:11:20,578 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 3  result [1439356303 2758777842 3198481255 1295004101 2893745053 1343053790
+  925429144 1411137157  949933667  792362853 1474228928 2061822464
+ 2294370792 1194030497 2332079242 3050661127]  
+2019-09-13 10:11:21,471 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 0  result [1713346794 3280853404 1532235720 2456672172  641331875 2415221176
+ 2168007530 3067085725 2918546594 1447453900 3835993125 1357983662
+ 1095861098   54780755 4146116248 1886739719]  
+2019-09-13 10:11:21,471 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 1  result [2082684411 2182224490 1735388188 1833542631 1017609335 1125818987
+ 3425709086 3215455887 3112531343 1157086885  194408388 2883676577
+ 3846797139 3673440139 2708952679 2136863594]  
+2019-09-13 10:11:21,471 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 2  result [3281086826 1596563898 2455111867 4089036070 1039999057 3488651684
+ 3479247309 2431004125 2276001072 3874773046 3608796986 3558308813
+ 3767088656 3419837464 2150106418 1097675486]  
+2019-09-13 10:11:21,471 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 3  result [2458616454 1599551549 3415231593 2123295303 4075437256  680388406
+ 1920529793 1802539649 4275893615 1529943476  552808462 2410832099
+ 3449386309 1432479151 2166367142 1914117401]  
+2019-09-13 10:11:22,377 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 0  result [ 979244809  441723888  225643294 3772727515 2833664404 2184899474
+  320035088 4102150097 1852286754 2487775315 3254079871 3447197588
+  294391790 3050277254  351647706 2897478092]  
+2019-09-13 10:11:22,377 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 1  result [ 469036505 3383562468  900170325 4054612353  718337591 2794333996
+ 2106006277  100464362 3151942955  603173995 3606015542 2153702081
+ 2102731691  644271044 2691628455  557263908]  
+2019-09-13 10:11:22,377 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 2  result [3764444689  328385381 2206726263 1420947156 2340859212 3459207410
+  941535343  873839590 2182510111  777948512 2801029068  153215820
+  177815595 1225913060 1532388423 3019189137]  
+2019-09-13 10:11:22,377 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 3  result [2244168443 3178892626 3713418459 1833225863 3113522652  538180325
+  684340894 1576533551 2671562560 3016360091  554232799 2995572009
+ 2891800677 1654608261  877496902 2952339432]  
+2019-09-13 10:11:23,284 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 0  result [2378504451 1025054287  475077467 3035360864 3594900030  140968728
+ 2952559376 2132485140 3120106499 2567777466 3462087847 1102566979
+ 1510962504 4155565431 2288820022 4248421477]  
+2019-09-13 10:11:23,284 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 1  result [4026673049 1526729335 3573287775 3779408769  657802317 2813358205
+ 4165686489 4033420191 3415064361 3402940919 1023633798 3791580072
+ 1560975752 2412878562 3035629302 2449475828]  
+2019-09-13 10:11:23,284 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 2  result [3091516156 4222649893 4131430770 3130118982 1598950910 3040691264
+ 4054506415 1645364939  710050580  701547028   86222153  693894155
+ 1380993795 1373154681 3557365228    5844930]  
+2019-09-13 10:11:23,315 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 3  result [3411263988 1792072516  870069656  526140034 4258245333  350459564
+ 1308572691  881789563 3973964727 2817464297 2780797633 2091455819
+ 3374362481 2289047154 2846714083 1554861025]  
+2019-09-13 10:11:24,222 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 0  result [3108035526 1203498544 1663912015  578146862 2876955171 2485717851
+ 2697990272 2409861260 3592613190 4222601138 3247725300  712301258
+  718376139 2455779635 3266864835 1680179284]  
+2019-09-13 10:11:24,222 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 1  result [3712349062 2770795122 4262551548  539162967 1461104213 3907498351
+ 1214032684 3557189887 1293648284 2764059349 3668169626 1970740453
+ 3251594557 2646299980 3515138008 1624271083]  
+2019-09-13 10:11:24,222 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 2  result [3252319681 2905511844 2291668733 2680491623 1978076291 3539129882
+ 3100550665 3975853809 4054199588  517904482 2725663980   63435772
+ 3391309501  170419425 1428421175 1332409118]  
+2019-09-13 10:11:24,222 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 3  result [1605173815 2308577121 1358361697 3025145379 3170405664   32833653
+   41614454 1666575665  397533358 2868837394 1078739540  864884948
+  107413511 4063429160 3001654667 3378089383]  
+2019-09-13 10:11:25,128 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 0  result [3465647083  456873823 3172183046  270251902 2721016730  994648426
+ 3046863603 3574580641 3756548314 4093589565 1955920890 1521585441
+  160468945 1751805081 2173737094 3027874839]  
+2019-09-13 10:11:25,128 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 1  result [ 502329103 2141759480 3777229832  673207638 2441402813  971685323
+  760631545 1851579684 2282259403 1142209082 3610199341  470174177
+  459173400 1014701911 3579314310 4216316816]  
+2019-09-13 10:11:25,128 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 2  result [ 334934559 3599894654 2672306117 2538198184 1495967813  139493124
+ 2810641128 3936625205 2524185933 3645196561 3055803881 2237274656
+ 1538040726 2119741496 1026692486 1161912118]  
+2019-09-13 10:11:25,128 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 3  result [3839824287  249166339 3515371498 3956857644 2165443654 2572785474
+ 2274569940  746547479  355707564 2697144273 1309187844  980834468
+ 1691594404 3151020847 3220996884 3790761103]  
+2019-09-13 10:11:26,034 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 0  result [3569623952 3116972610 3007993762 1652862028  205460296  559596335
+ 2553182416 1116483560 4112807576  887061612 4088832946  822755786
+  125703135 3506745456  189833427 4040035541]  
+2019-09-13 10:11:26,034 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 1  result [1425318342 2617214857 2444980095 2827234785  825634153 2174387094
+ 3097176662  835654253 1104581128 1250850843 2072454582  703182714
+  820671635  288654112 1289126988 2398503214]  
+2019-09-13 10:11:26,034 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 2  result [2358205017 1500937603 4280660188  855453999 2509975796  972948736
+ 3613564765  760959758  251205039 1573510347 2728439495 2971023317
+  377956191 1471559608 2856704252  875776000]  
+2019-09-13 10:11:26,034 - Log1 - Level 5 - Test asset  Dealing  blocksize 16 batchsize 10 dispatch [1, 2, 2]  init 10**6  YZID 3  result [2950811373  794874018 2647756066  913419496  388962854 3727993933
+ 2709070886  983464537 2231335334 1053434381 3003191454  148046788
+ 2391014198 1968444467 2976702674 4039618174]  
+2019-09-13 10:11:26,034 - Log1 - WARNING - Test asset Result shared (16) dispatch (1 , 2  , 2) 10 times  Inner(31540 times)  elapsed_time:9.3854[sec]  CheckSum []  
+2019-09-13 10:11:26,050 - Log1 - Level 5 - Entry Array  [500000.0, 1353979.125]
+2019-09-13 10:11:26,050 - Log1 - Level 5 - Entry Array  [500000.0, 1382067.125]
+2019-09-13 10:11:26,050 - Log1 - Level 5 - Entry Array  [500000.0, 1450316.25]
+2019-09-13 10:11:26,050 - Log1 - Level 5 - Entry Array  [500000.0, 1344839.0]
+2019-09-13 10:11:26,066 - Log1 - INFO - Ssbo Set io io bbid(5)  shape((640, 10))  data_shape((640, 10))
+2019-09-13 10:11:26,066 - Log1 - Level 5 - Set parameter  validate True 
+2019-09-13 10:11:26,066 - Log1 - Level 5 - Sampling  C:\\Users\kaz38/Downloads/UserID_0.json   choice [ 7.  8.  9. 12. 13. 15. 16. 18. 19. 23. 27. 28. 29. 30. 34. 36. 37. 39.
+ 40. 44. 46. 48. 50. 53. 58.]
+2019-09-13 10:11:26,081 - Log1 - INFO - mock::onsize (784, 318) 
+2019-09-13 10:11:26,097 - Log1 - Level 5 - Entry Array  [500000.0, 1353979.125]
+2019-09-13 10:11:26,097 - Log1 - Level 5 - Entry Array  [500000.0, 1382067.125]
+2019-09-13 10:11:26,097 - Log1 - Level 5 - Entry Array  [500000.0, 1450316.25]
+2019-09-13 10:11:26,097 - Log1 - Level 5 - Entry Array  [500000.0, 1344839.0]
+2019-09-13 10:11:27,675 - Log1 - INFO - ComputeShader Destroy [2, 4, 6]
+2019-09-13 10:11:27,675 - Log1 - INFO - Ssbo Destroy ['data', 'vis', 'dprop', 'ac', 'asset', 'io', 'dep']
+2019-09-13 10:11:27,675 - Log1 - INFO - PipeLine Destroy {GL_VERTEX_SHADER: 7, GL_FRAGMENT_SHADER: 8}
+2019-09-13 10:11:27,675 - Log1 - INFO - PipeLine Destroy {GL_VERTEX_SHADER: 9, GL_FRAGMENT_SHADER: 10}
+2019-09-13 10:11:27,675 - Log1 - INFO - Mock Destroy <====  Tasset
+2019-09-13 10:11:27,691 - Log1 - INFO - ComputeShader Destroy [2, 4]
+2019-09-13 10:11:27,691 - Log1 - INFO - Ssbo Destroy ['data', 'vis', 'dprop', 'ac', 'io']
+2019-09-13 10:11:27,691 - Log1 - INFO - PipeLine Destroy {GL_VERTEX_SHADER: 7, GL_FRAGMENT_SHADER: 8}
+2019-09-13 10:11:27,691 - Log1 - INFO - PipeLine Destroy {GL_VERTEX_SHADER: 5, GL_FRAGMENT_SHADER: 6}
+2019-09-13 10:11:27,691 - Log1 - INFO - Mock Destroy <====  TestVisual

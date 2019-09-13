@@ -188,6 +188,7 @@ def _compileShader( source, shaderType ):
         for l in glGetShaderInfoLog(shader).decode().split('\n'):
             e =  l.find(')')
             if e != -1:
+                print(l)
                 No = int(l[2:e])
                 for i,ofs in enumerate(ParseProgram.ofs):
                     if ofs[1] > No:

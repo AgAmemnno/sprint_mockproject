@@ -2,11 +2,9 @@
 #include <Mock1/parameter.glsl>
 #include <Mock1/mfi.glsl>
 #include <Mock1/ama.glsl>
-
 #include <Mock1/uniform.glsl>
 #include <Mock1/ac.glsl>
 #include <Mock1/inout.glsl>
-
 #include <Visual/mock2_buffer.glsl>
 
 uniform int PID=0;  //Path ID (sharedNum)
@@ -214,17 +212,17 @@ void main() {
     ASID = ASid(lid);
 
     Calc = false;
-    if(lid.x == PID){
-         Calc = true;
-    }else if(PID ==-1)Calc = true;
+    if (lid.x == PID){
+        Calc = true;
+    } else if (PID ==-1)Calc = true;
 
     VIS   = false;
     ASSET = false;
-    if(VIS_MODE == 1)VIS   = true;
-    if(VIS_MODE == 2)ASSET = true;
+    if (VIS_MODE == 1)VIS   = true;
+    if (VIS_MODE == 2)ASSET = true;
 
 
-    WG  = uvec3(1,2,2);//gl_NumWorkGroups;
+    WG  = uvec3(1, 2, 2);//gl_NumWorkGroups;
 
     for (uint i =0;i<uint(ceil(float(SHRTH)/float(SHXTH)));i++){
         uint  idx = lid.x + SHXTH*i;
@@ -238,12 +236,11 @@ void main() {
 
     float PMFI_TH     = 100;
 
-    if(PARA_MODE ==0){
-         Set_Param(47.0, 16.0, 12.2, 80.0, 91.0, 37.0, 0.008, 0.4);
-    }else if(PARA_MODE ==1){
-         Set_Param();
+    if (PARA_MODE ==0){
+        Set_Param(47.0, 16.0, 12.2, 80.0, 91.0, 37.0, 0.008, 0.4);
+    } else if (PARA_MODE ==1){
+        Set_Param();
     }
-
 
 
     IDX = SIDX = 0;
@@ -254,62 +251,59 @@ void main() {
     AMA  ama;
     AMA_Set(ama);
 
-
     Deal D;
     SetDeal(D);
 
     uint Ofs = 0;
 
-
     for (IDX = 1;IDX<TOTAL;IDX++){
 
         SIDX++;
 
-        if(Calc){
+        if (Calc){
+
             Calc_MFICROS(mfic);
             AMA_Calc(ama);
 
             Signal(D, ama, mfic);
 
-            if(VIS){
+            if (VIS){
                 vis[IDX].mu[YZID]   =  ama.mu;//ama.mu2;//0.5*sin(float(SIDX % SHRTH)/float(SHRTH))  + 0.5;//
                 vis[IDX].mu2[YZID]  =  ama.mu2;//0.5*cos(float(SIDX % SHRTH)/float(SHRTH))  + 0.5;//
             }
         }
-        if(SIDX == SHRTH-1){
+        if (SIDX == SHRTH-1){
             Ofs +=  SHRTH;
-            for(uint i =0;i<uint(ceil(float(SHRTH)/float(SHXTH)));i++){
+            for (uint i =0;i<uint(ceil(float(SHRTH)/float(SHXTH)));i++){
                 uint  idx = lid.x + SHXTH*i;
                 if (idx >= SHRTH)break;
                 uint   _idx = Ofs + idx;
-                if(_idx >= TOTAL)break;
+                if (_idx >= TOTAL)break;
                 rates[idx].tval =   (_rates[_idx].high + _rates[_idx].low + _rates[_idx].close)/3.;
                 rates[idx].open =   _rates[_idx].close;
                 barrier();
             }
             barrier();
             SIDX = -1;
+
         }
 
+
+        barrier();
+        if (D.Balance < 0)D.Balance = 0;
+
+        if (Calc){
+            io[ASID].y =  D.Balance;
+            atomicAdd(ac[YZID].i[lid.x], uint(D.Balance));
+            if (VIS){
+                dprop[YZID].entry[0] = int(D.ENums);
+                dprop[YZID].exit[0]  = int(D.Nums);
+            }
+            if (ASSET){
+                asset[ASID].x[0] = D.ANums;
+            }
+        }
     }
-
-    barrier();
-    if(D.Balance < 0)D.Balance = 0;
-
-    if(Calc){
-        io[ASID].y =  D.Balance;
-        atomicAdd(ac[YZID].i[lid.x],uint(D.Balance));
-        if(VIS){
-            dprop[YZID].entry[0] = int(D.ENums);
-            dprop[YZID].exit[0]  = int(D.Nums);
-        }
-        if(ASSET){
-            asset[ASID].x[0] = D.ANums;
-        }
-    }
-
-
 }
-
 
 

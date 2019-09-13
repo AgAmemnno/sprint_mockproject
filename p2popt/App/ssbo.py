@@ -65,7 +65,52 @@ class Sampler:
             else:
                 l = np.vstack((l, p))
 
-        return np.vstack((l, np.zeros(n))).T
+        l = np.vstack((l, np.zeros(n)))
+        l = np.vstack((l, np.zeros(n)))
+        return l.T
+    def roundset(self,name,num,samp_ra,samp_num):
+        pid = np.random.choice(np.arange(self.vth), samp_num,replace=False)
+        fn = "%s%s.json" % (self.path,name)
+        if not os.path.isfile(fn):
+            log.Error("inifile Not exist!!  %s" % fn)
+            return False
+        else:
+            with open(fn, mode='r') as f:
+                r0 = f.read()
+                r = json.loads(r0)
+                self.choice    = np.array(r["choice"]).astype(np.float)
+                data           = np.array(r["Data"]).astype(np.float)
+                l              = len(data.flatten())
+                log.Log("samplingload  %s  %d %d " % (self.choice, len(data),len(data[0])))
+                data           = data.reshape(int(l/(len(self.para_range)+2)),(len(self.para_range)+2))
+                if "Prop" in r:
+                    self.choiceNum = r["Prop"]["Choice"]
+                    self.fix = r["Prop"]["Fix"]
+                for i in range(self.sep):
+                    log.Info("ParameterLoad %s   length %d "%(fn,len(data)))
+                n     = data.shape[0]
+                param = data[np.random.randint(0,n,num),:]
+                N     = n//self.sep
+                for i, a in enumerate(self.para_range):
+                    if i in pid:
+                        if i == self.choiceNum:
+                            p  = self.choice[np.random.randint(0, len(self.choice), num)]
+                        else:
+                            ra = int(samp_ra * (a[1] - a[0]) / a[2])
+                            mu = param[:,i] - ra / 2
+                            mu[mu < a[0]] = a[0]
+                            log.Log("sampling mu_mean %.4f  0-%d  %d "%(mu.mean(),ra,N))
+                            p = (mu + a[2] * np.random.randint(0, ra, num)).tolist()
+                    else:
+                        p = param[:,i].tolist()
+                    if i == 0:
+                        l = p
+                    else:
+                        l = np.vstack((l, p))
+
+                l = np.vstack((l, np.zeros(num)))
+                l = np.vstack((l, np.zeros(num)))
+                return l.T
     def resultplot(self,asset):
 
         self.ax.cla()
@@ -93,7 +138,7 @@ class Sampler:
                 self.choiceNum = r["choiceNum"]
                 self.fix       = r["fix"]
 
-            os.remove(fn)
+            #os.remove(fn)
 
             for i, a in enumerate(self.para_range):
                 if i == self.choiceNum:
@@ -106,19 +151,26 @@ class Sampler:
                 else:
                     l = np.vstack((l, p))
 
-            return np.vstack((l, np.zeros(n))).T
-    def writeJson(self,p):
+            l = np.vstack((l, np.zeros(n)))
+            l = np.vstack((l, np.zeros(n)))
+            return l.T
+    def writeJson(self,p,name = None):
+        if name == None:
+            name = self.name
         Result = {
-            "Name" : "A",
-            "Prop" : {"Fix": self.fix, "Choice": self.choiceNum},
-            "ID"   : "%s-%d"%(self.name,self.num),
-            "Data" : p.tolist()
+            "Name"   : "A",
+            "Prop"   : {"Fix": self.fix, "Choice": self.choiceNum},
+            "ID"     : "%s-%d"%(name,self.num),
+            "Data"   : p.tolist(),
+            "choice" : self.choice.tolist()
         }
-
-        J = json.dumps(Result)
-        with open("%s%s_%d.json"%(self.path,self.name,self.num), mode='w') as f:
+        J  = json.dumps(Result)
+        fn = "%s%s_%d.json"%(self.path, name, self.num)
+        with open(fn, mode='w') as f:
             f.write(J)
         self.num += 1
+        log.Log("Sampling  %s   choice %s"%(fn,self.choice))
+
 
 #with open("tester.json", mode='r') as f:
 #    r = f.read()
@@ -316,7 +368,7 @@ class Ssbo:
             return
         name = "io"
         lth   = sep *  shid * batch
-        d     = np.zeros(lth*(vth + 1))
+        d     = np.zeros(lth*(vth + 2))
         nbyte = d.nbytes
         bbid  = ssbo_location[name]
         if not name in self.Prop:
@@ -332,12 +384,32 @@ class Ssbo:
         glBufferData(GL_SHADER_STORAGE_BUFFER, d.flatten().astype(np.float32), GL_DYNAMIC_DRAW)
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bbid, ssbo)
         self.Ammount      += nbyte
-        self.Prop[name]  = [ssbo,bbid,nbyte, (lth,vth+1)]
+        self.Prop[name]  = [ssbo,bbid,nbyte, (lth,vth+2)]
 
         log.Info("Ssbo Generate %s bbid(%d) nbyte(%d) shape(%s)  Ammount(%d)"%(name,bbid,nbyte,self.Prop[name][3],self.Ammount))
 
         #ToDo  Validate SSBO
         return True
+    def Set_Dep(self):
+        name = "dep"
+        bbid = ssbo_location[name]
+        size = [512,512]
+        nbyte = mul(size) * 4
+        if not name  in self.Prop:
+            if not bool(glGenBuffers):
+                log.Error("Error Generate SSBO")
+                return False
+            ssbo  = glGenBuffers(1)
+        else:
+            ssbo =  self.Prop[name][0]
+            self.Ammount -= self.Prop[name][2]
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo)
+        glBufferData(GL_SHADER_STORAGE_BUFFER,np.zeros(mul(size)).astype(np.float), GL_DYNAMIC_DRAW)
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bbid, ssbo)
+        self.Ammount += nbyte
+        self.Prop[name] = [ssbo, bbid, nbyte,size]
+        log.Info("Ssbo Generate %s bbid(%d) nbyte(%d) shape(%s)  Ammount(%d)" % (name, bbid, nbyte, size, self.Ammount))
     def G2C(self,tag,data = None):
         if   tag    == "np_ac":
             glBindBuffer(GL_SHADER_STORAGE_BUFFER, self.Prop["ac"][0])
@@ -426,7 +498,6 @@ class Ssbo:
             glUnmapBuffer(GL_SHADER_STORAGE_BUFFER)
             return data.reshape(*self.Prop["asset"][3])
         elif tag    == "set_io":
-
             name = "io"
             glBindBuffer(GL_SHADER_STORAGE_BUFFER, self.Prop[name][0])
             glBufferData(GL_SHADER_STORAGE_BUFFER, data.flatten().astype(np.float32), GL_DYNAMIC_DRAW)
@@ -441,7 +512,19 @@ class Ssbo:
             data = np.ctypeslib.as_array(ptr.from_address(data)).astype(np.float)
             glUnmapBuffer(GL_SHADER_STORAGE_BUFFER)
             return data.reshape(*self.Prop[name][3])
-
+        elif tag    == "clear_io_sel":
+            name = "io"
+            data[:,self.Prop[name][3][1]-1] = 0
+            glBindBuffer(GL_SHADER_STORAGE_BUFFER, self.Prop[name][0])
+            glBufferData(GL_SHADER_STORAGE_BUFFER, data.flatten().astype(np.float32), GL_DYNAMIC_DRAW)
+            #glBindBufferBase(GL_SHADER_STORAGE_BUFFER,self.Prop[name][1], self.Prop[name][0])
+            #log.Info("Ssbo Clear io %s bbid(%d)  shape(%s)  data_shape(%s)" % (
+            #name,self.Prop[name][1], self.Prop[name][3],data.shape))
+        elif tag    == "choice_io":
+            name = "io"
+            data = self.G2C("np_io")
+            q    = data[:, self.Prop[name][3][1] - 1]
+            return data[np.where(q == 1), :][0]
 
 if __name__ == "__main__":
    #ssbo = Ssbo()
